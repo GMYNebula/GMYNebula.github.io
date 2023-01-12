@@ -1,0 +1,108 @@
+:root {
+    --btn-bg: #49b1f5;
+    --btn-color: #fff;
+    --btn-hover-color: #ff7242;
+    --reward-pop: #f5f5f5;
+}
+
+[data-theme=dark] {
+    --btn-bg: #1f1f1f;
+    --btn-color: rgba(255, 255, 255, 0.7);
+    --btn-hover-color: #787878;
+    --reward-pop: #2c2c2c;
+}
+
+.reward-main {
+    -webkit-animation: donate_effcet .3s .1s ease both;
+    -moz-animation: donate_effcet .3s .1s ease both;
+    -o-animation: donate_effcet .3s .1s ease both;
+    -ms-animation: donate_effcet .3s .1s ease both;
+    animation: donate_effcet .3s .1s ease both
+}
+
+.post-reward {
+    position: relative;
+    margin-top: 80px;
+    width: 100%;
+    text-align: center;
+    pointer-events: none
+}
+
+.post-reward>* {
+    pointer-events: auto
+}
+
+.post-reward .reward-button {
+    display: inline-block;
+    padding: 4px 24px;
+    border-radius: 4px;
+    background: var(--btn-bg);
+    color: var(--btn-color);
+    cursor: pointer
+}
+
+.post-reward:hover .reward-button {
+    background: var(--btn-hover-color)
+}
+
+.post-reward:hover>.reward-main {
+    display: block
+}
+
+.post-reward .reward-main {
+    position: absolute;
+    bottom: 40px;
+    left: 0;
+    z-index: 100;
+    display: none;
+    padding: 0 0 15px;
+    width: 100%
+}
+
+.post-reward .reward-main .reward-all {
+    display: inline-block;
+    margin: 0;
+    padding: 20px 10px;
+    border-radius: 4px;
+    background: var(--reward-pop)
+}
+
+.post-reward .reward-main .reward-all:before {
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 100%;
+    height: 20px;
+    content: ''
+}
+
+.post-reward .reward-main .reward-all:after {
+    position: absolute;
+    right: 0;
+    bottom: 2px;
+    left: 0;
+    margin: 0 auto;
+    width: 0;
+    height: 0;
+    border-top: 13px solid var(--reward-pop);
+    border-right: 13px solid transparent;
+    border-left: 13px solid transparent;
+    content: ''
+}
+
+.post-reward .reward-main .reward-all .reward-item {
+    display: inline-block;
+    padding: 0 8px;
+    list-style-type: none;
+    vertical-align: top
+}
+
+.post-reward .reward-main .reward-all .reward-item img {
+    width: 130px;
+    height: 130px
+}
+
+.post-reward .reward-main .reward-all .reward-item .post-qr-code-desc {
+    width: 130px;
+    color: #858585
+}
