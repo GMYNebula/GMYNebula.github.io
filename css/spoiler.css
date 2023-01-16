@@ -51,7 +51,7 @@
 }
 
 .spoiler.expanded .spoiler-content {
-    max-height: 300000px;
+    max-height: 3000px;
     overflow: hidden;
 }
 
