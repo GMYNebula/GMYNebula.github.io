@@ -22,3 +22,9 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# local leftovers
+.tmp-*.html
+home-full.png
+home-top.png
+

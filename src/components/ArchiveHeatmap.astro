@@ -1,0 +1,139 @@
+---
+import Icon from './Icon.astro';
+import type { HeatmapData } from '@rsalianto/git-heatmap-core';
+
+interface Props {
+	data: HeatmapData;
+}
+
+const { data } = Astro.props;
+const heatmapJson = JSON.stringify(data);
+---
+
+<section class="heatmap-zone" data-reveal aria-label="发文热力图">
+	<header class="heatmap-head">
+		<div>
+			<h2><Icon name="archive" size={18} /> 发文热力图</h2>
+			<p class="heatmap-stat">
+				过去 {data.weeks.length} 周共 <strong>{data.totalContributions}</strong> 篇
+			</p>
+		</div>
+		<a class="heatmap-more" href="/archives/">
+			归档 <Icon name="arrow" size={13} />
+		</a>
+	</header>
+
+	<div class="heatmap-card" data-blog-heatmap-json={heatmapJson}>
+		<git-heatmap
+			class="nicocat-git-heatmap"
+			label="发文热力图"
+			show-total="false"
+			show-legend="true"
+			show-month-labels="true"
+			show-day-labels="true"
+		></git-heatmap>
+	</div>
+</section>
+
+<script>
+	import { initBlogHeatmap } from '../scripts/post-heatmap-mount.ts';
+	initBlogHeatmap();
+</script>
+
+<style is:global>
+	/* 主题变量：在 host 上覆盖，会传入 git-heatmap Shadow DOM（见 @rsalianto/git-heatmap-vanilla） */
+	html[data-theme='dark'] .nicocat-git-heatmap {
+		--ghm-color-l0: rgba(255, 255, 255, 0.08);
+		--ghm-color-l1: #0e4429;
+		--ghm-color-l2: #006d32;
+		--ghm-color-l3: #26a641;
+		--ghm-color-l4: #39d353;
+		--ghm-text: rgba(255, 255, 255, 0.5);
+		--ghm-tooltip-bg: #1c2128;
+		--ghm-tooltip-border: rgba(255, 255, 255, 0.1);
+		--ghm-tooltip-text: rgba(255, 255, 255, 0.75);
+		--ghm-selected: rgba(255, 255, 255, 0.7);
+	}
+
+	html[data-theme='light'] .nicocat-git-heatmap {
+		--ghm-color-l0: #ebedf0;
+		--ghm-color-l1: #9be9a8;
+		--ghm-color-l2: #40c463;
+		--ghm-color-l3: #30a14e;
+		--ghm-color-l4: #216e39;
+		--ghm-text: rgba(27, 31, 36, 0.55);
+		--ghm-tooltip-bg: #fff;
+		--ghm-tooltip-border: #d0d7de;
+		--ghm-tooltip-text: #24292f;
+		--ghm-selected: rgba(27, 31, 36, 0.45);
+	}
+</style>
+
+<style>
+	.heatmap-zone {
+		display: grid;
+		gap: 0.85rem;
+	}
+
+	.heatmap-head {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+
+	.heatmap-head h2 {
+		margin: 0 0 0.35rem;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		font-family: var(--font-display-stack);
+		font-size: 1.15rem;
+		font-weight: 600;
+		color: var(--ink);
+	}
+
+	.heatmap-stat {
+		margin: 0;
+		font-size: 0.84rem;
+		color: var(--muted);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.heatmap-stat strong {
+		color: var(--ink-soft);
+		font-weight: 700;
+	}
+
+	.heatmap-more {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25rem;
+		font-size: 0.88rem;
+		font-weight: 600;
+		color: var(--muted);
+		text-decoration: none;
+		flex-shrink: 0;
+	}
+
+	.heatmap-more:hover {
+		color: var(--accent);
+	}
+
+	.heatmap-card {
+		padding: 0.85rem 0.95rem 0.75rem;
+		border-radius: 0.85rem;
+		border: 1px solid var(--line);
+		background: color-mix(in srgb, var(--glass) 72%, transparent);
+		box-shadow: var(--shadow-panel);
+		overflow: hidden;
+	}
+
+	.nicocat-git-heatmap {
+		display: block;
+		width: 100%;
+		min-width: 0;
+		--ghm-font: var(--font-body-stack);
+		--ghm-fs: 11px;
+	}
+</style>

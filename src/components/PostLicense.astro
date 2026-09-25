@@ -1,0 +1,136 @@
+---
+import { SITE_AUTHOR } from '../consts';
+import { postLicense } from '../data/license';
+import FormattedDate from './FormattedDate.astro';
+import Icon from './Icon.astro';
+
+interface Props {
+	title: string;
+	pubDate: Date;
+}
+
+const { title, pubDate } = Astro.props;
+const postUrl = Astro.url.href;
+const year = pubDate.getFullYear();
+---
+
+<footer class="post-license" data-pagefind-ignore>
+	<p class="post-license-title">
+		<Icon name="file-text" size={14} />
+		许可协议
+	</p>
+	<dl class="post-license-meta">
+		<div>
+			<dt>作者</dt>
+			<dd>{SITE_AUTHOR}</dd>
+		</div>
+		<div>
+			<dt>发布于</dt>
+			<dd><FormattedDate date={pubDate} mode="date" /></dd>
+		</div>
+		<div>
+			<dt>许可</dt>
+			<dd>
+				<a href={postLicense.url} rel="license noopener noreferrer" target="_blank">
+					{postLicense.label}
+				</a>
+			</dd>
+		</div>
+	</dl>
+	<p class="post-license-text">
+		© {year} {SITE_AUTHOR} · 《{title}》采用
+		<a href={postLicense.url} rel="license noopener noreferrer" target="_blank">
+			{postLicense.label}
+		</a>
+		；转载请署名并链接至
+		<a href={postUrl}>{postUrl}</a>。
+	</p>
+</footer>
+
+<style>
+	.post-license {
+		margin-top: 1.75rem;
+		padding-top: 1.25rem;
+		border-top: 1px dashed var(--line);
+	}
+
+	.post-license-title {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		margin: 0 0 0.75rem;
+		font-size: 0.82rem;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		color: var(--muted);
+	}
+
+	.post-license-title :global(svg) {
+		opacity: 0.75;
+		color: var(--accent-deep);
+	}
+
+	.post-license-meta {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 0.55rem 0.75rem;
+		margin: 0 0 0.85rem;
+	}
+
+	.post-license-meta div {
+		min-width: 0;
+	}
+
+	.post-license-meta dt {
+		margin: 0 0 0.15rem;
+		font-size: 0.72rem;
+		font-weight: 600;
+		color: var(--muted);
+	}
+
+	.post-license-meta dd {
+		margin: 0;
+		font-size: 0.86rem;
+		font-weight: 600;
+		color: var(--ink-soft);
+	}
+
+	.post-license-meta a {
+		color: var(--accent-deep);
+		text-decoration: none;
+	}
+
+	.post-license-meta a:hover {
+		text-decoration: underline;
+		text-underline-offset: 0.18em;
+	}
+
+	.post-license-text {
+		margin: 0;
+		font-size: 0.84rem;
+		line-height: 1.65;
+		color: var(--muted);
+	}
+
+	.post-license-text a {
+		color: var(--ink-soft);
+		font-weight: 600;
+		text-decoration: none;
+		word-break: break-all;
+	}
+
+	.post-license-text a[rel='license'] {
+		color: var(--accent-deep);
+	}
+
+	.post-license-text a:hover {
+		text-decoration: underline;
+		text-underline-offset: 0.18em;
+	}
+
+	@media (max-width: 640px) {
+		.post-license-meta {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

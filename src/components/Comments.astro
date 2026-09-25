@@ -1,0 +1,51 @@
+---
+import {
+	GISCUS_CATEGORY,
+	GISCUS_CATEGORY_ID,
+	GISCUS_REPO,
+	GISCUS_REPO_ID,
+	giscusEnabled,
+} from '../consts';
+---
+
+{
+	giscusEnabled && (
+		<section
+			class="comments"
+			data-comments-root
+			data-repo={GISCUS_REPO}
+			data-repo-id={GISCUS_REPO_ID}
+			data-category={GISCUS_CATEGORY}
+			data-category-id={GISCUS_CATEGORY_ID}
+		>
+			<div class="comments-panel glass">
+				<header class="comments-header">
+					<div class="comments-header-start">
+						<p class="comments-count" data-comments-count>
+							加载评论…
+						</p>
+						<div class="comments-sort" data-comments-sort hidden>
+							<button type="button" class="comments-sort-btn is-active" data-sort="newest">
+								最新
+							</button>
+							<button type="button" class="comments-sort-btn" data-sort="oldest">
+								最早
+							</button>
+						</div>
+					</div>
+					<div class="comments-auth" data-comments-auth hidden />
+				</header>
+
+				<div class="comments-compose" data-comments-compose />
+
+				<div class="comments-list" data-comments-list />
+
+				<p class="comments-status" data-comments-status hidden />
+			</div>
+		</section>
+	)
+}
+
+<script>
+	import '../scripts/comments.ts';
+</script>

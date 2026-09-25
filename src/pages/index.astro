@@ -1,49 +1,851 @@
 ---
+import { Image } from 'astro:assets';
+import ArchiveHeatmap from '../components/ArchiveHeatmap.astro';
+import AvatarPendant from '../components/AvatarPendant.astro';
 import BaseHead from '../components/BaseHead.astro';
+import BrandIcon from '../components/BrandIcon.astro';
+import CategoryChip from '../components/CategoryChip.astro';
 import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import HomeClock from '../components/HomeClock.astro';
+import Icon from '../components/Icon.astro';
+import {
+	SITE_AUTHOR,
+	SITE_AUTHOR_EN,
+	SITE_DESCRIPTION,
+	SITE_TITLE,
+} from '../consts';
+import { profile } from '../data/profile';
+import { getAllCategories } from '../utils/categories';
+import { getPublishedPosts } from '../utils/posts';
+import { buildBlogHeatmapData } from '../utils/post-heatmap';
+import { getAllTags } from '../utils/tags';
+
+const all = await getPublishedPosts();
+const posts = all.filter((p) => !p.data.draft);
+const featured = posts.find((p) => p.data.heroImage) ?? posts[0];
+const recent = posts.filter((p) => p.id !== featured?.id).slice(0, 4);
+const postCount = posts.length;
+const tags = (await getAllTags()).slice(0, 8);
+const categories = await getAllCategories();
+const heatmapData = buildBlogHeatmapData(posts);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<BaseHead
+			title={SITE_TITLE}
+			description={SITE_DESCRIPTION}
+			image={featured?.data.heroImage}
+		/>
 	</head>
 	<body>
 		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This template
-				serves as a lightweight, minimally-styled starting point for anyone looking to build a personal
-				website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/">read the docs</a>
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
+		<main class="home">
+			<section class="bento top">
+				<article class="card identity">
+					<div class="glow" aria-hidden="true"></div>
+					<AvatarPendant alt={`${SITE_AUTHOR} 头像`} size="11rem" width={176} height={176} />
+					<div class="identity-main">
+						<h1 class="brand">{SITE_TITLE}</h1>
+						<p class="who">
+							{SITE_AUTHOR}
+							<span class="sep">·</span>
+							{SITE_AUTHOR_EN}
+						</p>
+						<a class="email" href={`mailto:${profile.email}`}>{profile.email}</a>
+						<p class="bio">{SITE_DESCRIPTION}</p>
+						<nav class="social-row" aria-label="社交链接">
+							<a href={profile.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+								<BrandIcon name="github" size={20} />
+							</a>
+							<a href={profile.bilibili} target="_blank" rel="noopener noreferrer" aria-label="Bilibili">
+								<BrandIcon name="bilibili" size={20} />
+							</a>
+							<a href={profile.csdn} target="_blank" rel="noopener noreferrer" aria-label="CSDN">
+								<BrandIcon name="csdn" size={20} />
+							</a>
+						</nav>
+					</div>
+					<footer class="identity-foot">
+						<a class="meta-link" href="/archives">
+							<strong>{postCount}</strong> 篇文章
+						</a>
+						<span class="meta-sep" aria-hidden="true">·</span>
+						<a class="meta-link" href="/categories">分类</a>
+						<span class="meta-sep" aria-hidden="true">·</span>
+						<a class="meta-link" href="/archives">归档</a>
+						<span class="meta-sep" aria-hidden="true">·</span>
+						<a class="meta-link" href="/about">关于</a>
+					</footer>
+				</article>
+
+				<div class="bento-right">
+					{
+						featured && (
+							<a class="card feature" href={`/blog/${featured.id}/`}>
+								{featured.data.heroImage && (
+									<div class="feature-media">
+										<Image
+											src={featured.data.heroImage}
+											alt=""
+											width={900}
+											height={720}
+											sizes="(max-width: 900px) 100vw, 420px"
+											loading="eager"
+											fetchpriority="high"
+										/>
+										<div class="feature-shade" />
+									</div>
+								)}
+								<div class="feature-copy">
+									<span class="pill">
+										<Icon name="moon" size={12} />
+										最新
+									</span>
+									<h2>{featured.data.title}</h2>
+									<p>{featured.data.description}</p>
+									<span class="when">
+										<FormattedDate date={featured.data.pubDate} />
+										<em aria-hidden="true">
+											阅读 <Icon name="arrow" size={14} />
+										</em>
+									</span>
+								</div>
+							</a>
+						)
+					}
+					<HomeClock />
+				</div>
+			</section>
+
+			<ArchiveHeatmap data={heatmapData} />
+
+			<section class="zone categories-zone" data-reveal style="--stagger:1">
+				<header class="zone-head">
+					<h2><Icon name="layers" size={18} /> 分类</h2>
+					<a class="zone-more" href="/categories">
+						全部 <Icon name="arrow" size={13} />
+					</a>
+				</header>
+				<ul class="category-cards">
+					{
+						categories.map((cat, i) => (
+							<li data-reveal style={`--stagger:${i}`}>
+								<a class={`category-card tone-${cat.tone}`} href={`/categories/${cat.name}/`}>
+									<span class="cat-icon" aria-hidden="true">
+										<Icon name={cat.icon} size={20} />
+									</span>
+									<span class="cat-copy">
+										<strong>{cat.name}</strong>
+										<span class="cat-desc">{cat.description}</span>
+									</span>
+									<span class="cat-count">{cat.count} 篇</span>
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</section>
+
+			<section class="bento bottom" data-reveal style="--stagger:2">
+				{
+					recent.length > 0 && (
+						<div class="card panel">
+							<header class="panel-head">
+								<h2>
+									<Icon name="blog" size={17} /> 最近更新
+								</h2>
+								<a href="/archives">
+									归档 <Icon name="arrow" size={13} />
+								</a>
+							</header>
+							<ol class="recent">
+								{recent.map((post) => (
+									<li>
+										<a href={`/blog/${post.id}/`}>
+											{post.data.heroImage ? (
+												<span class="thumb">
+													<Image src={post.data.heroImage} alt="" width={120} height={80} />
+												</span>
+											) : (
+												<span class="thumb empty" />
+											)}
+											<span class="copy">
+												<span class="title">{post.data.title}</span>
+												<span class="recent-meta">
+													<span class="date">
+														<FormattedDate date={post.data.pubDate} />
+													</span>
+													<span class="meta-sep" aria-hidden="true">·</span>
+													<CategoryChip
+														name={post.data.category}
+														variant="inline"
+														link={false}
+													/>
+												</span>
+											</span>
+										</a>
+									</li>
+								))}
+							</ol>
+						</div>
+					)
+				}
+
+				{
+					tags.length > 0 && (
+						<div class="card panel tags-panel">
+							<header class="panel-head">
+								<h2>
+									<Icon name="tag" size={17} /> 文章标签
+								</h2>
+								<a href="/tags">
+									全部 <Icon name="arrow" size={13} />
+								</a>
+							</header>
+							<ul class="tag-cloud">
+								{tags.map((tag) => (
+									<li>
+										<a href={`/tags/${tag.slug}/`}>
+											{tag.name}
+											<span>{tag.count}</span>
+										</a>
+									</li>
+								))}
+							</ul>
+						</div>
+					)
+				}
+			</section>
 		</main>
 		<Footer />
 	</body>
 </html>
+
+<style>
+	.home {
+		width: min(1120px, calc(100% - 2.5rem));
+		margin: 0 auto;
+		padding: 2.4rem 0 4.5rem;
+		display: grid;
+		gap: 1.35rem;
+	}
+
+	.card {
+		position: relative;
+		overflow: hidden;
+		border-radius: 1.25rem;
+		background: linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+		border: 1px solid var(--line);
+		backdrop-filter: blur(18px) saturate(1.25);
+		-webkit-backdrop-filter: blur(18px) saturate(1.25);
+		box-shadow: var(--shadow-panel);
+	}
+
+	.card.identity {
+		overflow: visible;
+	}
+
+	.bento.top {
+		display: grid;
+		grid-template-columns: minmax(16rem, 0.88fr) minmax(0, 1.32fr);
+		gap: 1.1rem;
+		align-items: stretch;
+		animation: rise 0.6s ease both;
+	}
+
+	.bento-right {
+		display: flex;
+		flex-direction: column;
+		gap: 1.1rem;
+		min-width: 0;
+	}
+
+	.identity {
+		padding: 1.55rem 1.25rem 1.2rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+	}
+
+	.identity .glow {
+		position: absolute;
+		inset: -15% auto auto 50%;
+		transform: translateX(-50%);
+		width: 85%;
+		height: 55%;
+		background: radial-gradient(circle, rgba(232, 131, 107, 0.32), transparent 70%);
+		pointer-events: none;
+	}
+
+	.identity-main {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		width: 100%;
+		flex: 1;
+	}
+
+	.brand {
+		margin: 0 0 0.35rem;
+		font-family: var(--font-display-stack);
+		font-size: clamp(1.55rem, 2.8vw, 1.95rem);
+		line-height: 1.15;
+		letter-spacing: -0.02em;
+	}
+
+	.who {
+		margin: 0 0 0.45rem;
+		font-size: 0.92rem;
+		font-weight: 600;
+		color: var(--muted);
+	}
+
+	.who .sep {
+		margin: 0 0.25rem;
+		opacity: 0.55;
+	}
+
+	.email {
+		display: inline-block;
+		margin: 0 0 0.85rem;
+		color: var(--ink-soft);
+		font-size: 0.84rem;
+		font-weight: 600;
+		text-decoration: none;
+		transition: color 0.15s ease;
+	}
+
+	.email:hover {
+		color: var(--accent-deep);
+	}
+
+	.bio {
+		margin: 0 0 1rem;
+		max-width: 24ch;
+		color: var(--ink-soft);
+		font-size: 0.9rem;
+		line-height: 1.65;
+	}
+
+	.social-row {
+		display: flex;
+		justify-content: center;
+		flex-wrap: wrap;
+		gap: 0.55rem;
+	}
+
+	.social-row a {
+		display: inline-grid;
+		place-items: center;
+		width: 2.55rem;
+		height: 2.55rem;
+		border: 1px solid var(--line);
+		border-radius: 999px;
+		color: var(--ink-soft);
+		background: color-mix(in srgb, var(--glass) 88%, transparent);
+		transition:
+			border-color 0.15s ease,
+			color 0.15s ease,
+			background 0.15s ease,
+			transform 0.15s ease;
+	}
+
+	.social-row a:hover {
+		border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+		background: var(--accent-glow);
+		color: var(--accent-deep);
+		transform: translateY(-2px);
+	}
+
+	.identity-foot {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.35rem 0.55rem;
+		width: 100%;
+		margin-top: 1.05rem;
+		padding-top: 0.9rem;
+		border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+	}
+
+	.meta-link {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.2rem;
+		text-decoration: none;
+		font-size: 0.82rem;
+		font-weight: 500;
+		color: var(--muted);
+		transition: color 0.15s ease;
+	}
+
+	.meta-link:hover {
+		color: var(--accent-deep);
+	}
+
+	.meta-link strong {
+		font-family: var(--font-display-stack);
+		font-size: 0.92rem;
+		font-weight: 700;
+		color: var(--ink-soft);
+		letter-spacing: -0.02em;
+	}
+
+	.meta-link:hover strong {
+		color: var(--accent-deep);
+	}
+
+	.meta-sep {
+		color: color-mix(in srgb, var(--muted) 55%, transparent);
+		font-size: 0.75rem;
+		user-select: none;
+	}
+
+	.feature {
+		display: grid;
+		grid-template-columns: minmax(10.5rem, 0.9fr) minmax(0, 1.1fr);
+		text-decoration: none;
+		color: inherit;
+		isolation: isolate;
+		width: 100%;
+		height: 14.5rem;
+		max-height: 14.5rem;
+		flex: 0 0 auto;
+		transition:
+			transform 0.3s ease,
+			border-color 0.3s ease,
+			box-shadow 0.3s ease;
+	}
+
+	.feature:hover {
+		transform: translateY(-2px);
+		border-color: var(--line-strong);
+		box-shadow: var(--shadow-panel-hover);
+	}
+
+	.feature-media {
+		position: relative;
+		min-height: 100%;
+		overflow: hidden;
+		background: var(--bg-2);
+	}
+
+	.feature-media :global(img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.7s ease;
+	}
+
+	.feature:hover .feature-media :global(img) {
+		transform: scale(1.05);
+	}
+
+	.feature-shade {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			90deg,
+			transparent 55%,
+			color-mix(in srgb, var(--glass) 35%, transparent)
+		);
+		pointer-events: none;
+	}
+
+	.feature-copy {
+		position: relative;
+		z-index: 1;
+		padding: 1.25rem 1.3rem 1.2rem;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		gap: 0.45rem;
+		background: linear-gradient(
+			160deg,
+			color-mix(in srgb, var(--glass) 92%, transparent),
+			color-mix(in srgb, var(--glass) 70%, transparent)
+		);
+	}
+
+	.pill {
+		width: fit-content;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		padding: 0.18rem 0.5rem;
+		border-radius: 999px;
+		font-size: 0.7rem;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		color: var(--accent-deep);
+		background: var(--accent-glow);
+		border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+	}
+
+	.feature-copy h2 {
+		margin: 0;
+		color: var(--ink);
+		font-size: clamp(1.2rem, 2.1vw, 1.55rem);
+		letter-spacing: -0.02em;
+		line-height: 1.25;
+	}
+
+	.feature-copy p {
+		margin: 0;
+		color: var(--ink-soft);
+		font-size: 0.9rem;
+		line-height: 1.55;
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	.when {
+		margin-top: 0.35rem;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 0.75rem;
+		font-size: 0.82rem;
+		font-weight: 600;
+		color: var(--muted);
+	}
+
+	.when em {
+		font-style: normal;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25rem;
+		color: var(--accent-deep);
+		transition: transform 0.25s ease;
+	}
+
+	.feature:hover .when em {
+		transform: translateX(3px);
+	}
+
+	.zone {
+		animation: rise 0.7s ease 0.06s both;
+	}
+
+	.zone-head {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-bottom: 0.85rem;
+		padding: 0 0.2rem;
+	}
+
+	.zone-head h2 {
+		margin: 0;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-size: 1.25rem;
+	}
+
+	.zone-more {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.2rem;
+		font-size: 0.86rem;
+		font-weight: 700;
+		color: var(--muted);
+		text-decoration: none;
+		transition: color 0.15s ease;
+	}
+
+	.zone-more:hover {
+		color: var(--accent-deep);
+	}
+
+	.category-cards {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 0.85rem;
+	}
+
+	.category-card {
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		align-items: center;
+		gap: 0.85rem;
+		padding: 1rem 1.05rem;
+		border-radius: 1rem;
+		text-decoration: none;
+		color: inherit;
+		background: linear-gradient(160deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.025));
+		border: 1px solid var(--line);
+		backdrop-filter: blur(14px);
+		box-shadow: var(--shadow-panel);
+		transition:
+			transform 0.22s ease,
+			border-color 0.22s ease,
+			background 0.22s ease,
+			box-shadow 0.22s ease;
+	}
+
+	.category-card:hover {
+		transform: translateY(-3px);
+		border-color: color-mix(in srgb, var(--tone) 45%, var(--line));
+		background: linear-gradient(
+			160deg,
+			color-mix(in srgb, var(--tone) 12%, rgba(255, 255, 255, 0.1)),
+			rgba(255, 255, 255, 0.03)
+		);
+		box-shadow: var(--shadow-panel-hover);
+	}
+
+	.cat-icon {
+		display: grid;
+		place-items: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: 0.75rem;
+		background: color-mix(in srgb, var(--tone) 16%, transparent);
+		border: 1px solid color-mix(in srgb, var(--tone) 32%, var(--line));
+		color: color-mix(in srgb, var(--tone) 82%, var(--ink));
+	}
+
+	.cat-copy {
+		display: grid;
+		gap: 0.15rem;
+		min-width: 0;
+	}
+
+	.cat-copy strong {
+		font-family: var(--font-display-stack);
+		font-size: 1.05rem;
+	}
+
+	.cat-desc {
+		font-size: 0.82rem;
+		color: var(--ink-soft);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.cat-count {
+		font-size: 0.78rem;
+		font-weight: 700;
+		color: var(--muted);
+		white-space: nowrap;
+	}
+
+	.category-card.tone-coral {
+		--tone: #f0a48e;
+	}
+	.category-card.tone-teal {
+		--tone: #7fc4b5;
+	}
+	.category-card.tone-amber {
+		--tone: #e6c07b;
+	}
+
+	.bento.bottom {
+		display: grid;
+		grid-template-columns: 1.35fr 0.85fr;
+		gap: 1.1rem;
+		animation: rise 0.7s ease 0.12s both;
+	}
+
+	.panel {
+		padding: 1.2rem 1.25rem 1.3rem;
+	}
+
+	.panel-head {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-bottom: 0.9rem;
+	}
+
+	.panel-head h2 {
+		margin: 0;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-size: 1.2rem;
+	}
+
+	.panel-head a {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.2rem;
+		font-size: 0.86rem;
+		font-weight: 700;
+		color: var(--muted);
+		text-decoration: none;
+	}
+
+	.panel-head a:hover {
+		color: var(--accent);
+	}
+
+	.recent {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 0.45rem;
+	}
+
+	.recent a {
+		display: grid;
+		grid-template-columns: 4.4rem 1fr;
+		gap: 0.85rem;
+		align-items: center;
+		padding: 0.55rem;
+		border-radius: 0.8rem;
+		text-decoration: none;
+		color: inherit;
+		transition: background 0.2s ease;
+	}
+
+	.recent a:hover {
+		background: rgba(255, 255, 255, 0.05);
+	}
+
+	.thumb {
+		display: block;
+		overflow: hidden;
+		border-radius: 0.55rem;
+		aspect-ratio: 4 / 3;
+		background: var(--bg-2);
+	}
+
+	.thumb :global(img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.4s ease;
+	}
+
+	.recent a:hover .thumb :global(img) {
+		transform: scale(1.06);
+	}
+
+	.thumb.empty {
+		background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(232, 131, 107, 0.18));
+	}
+
+	.copy {
+		display: grid;
+		gap: 0.2rem;
+		min-width: 0;
+	}
+
+	.copy .title {
+		font-family: var(--font-display-stack);
+		font-weight: 700;
+		font-size: 1.02rem;
+		letter-spacing: -0.01em;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.recent a:hover .title {
+		color: var(--accent);
+	}
+
+	.recent-meta {
+		display: inline-flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+		font-size: 0.8rem;
+		font-weight: 600;
+	}
+
+	.recent-meta .date {
+		color: var(--muted);
+	}
+
+	.recent-meta .meta-sep {
+		opacity: 0.45;
+		user-select: none;
+	}
+
+	.tag-cloud {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.55rem;
+	}
+
+	.tag-cloud a {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.4rem;
+		padding: 0.42rem 0.8rem;
+		border-radius: 999px;
+		border: 1px solid var(--line);
+		background: rgba(255, 255, 255, 0.04);
+		text-decoration: none;
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--ink);
+		transition:
+			background 0.2s ease,
+			border-color 0.2s ease,
+			color 0.2s ease;
+	}
+
+	.tag-cloud a:hover {
+		background: var(--accent-glow);
+		border-color: rgba(232, 131, 107, 0.4);
+		color: var(--accent-deep);
+	}
+
+	.tag-cloud a span {
+		font-size: 0.76rem;
+		color: var(--muted);
+	}
+
+	@media (max-width: 900px) {
+		.bento.top,
+		.bento.bottom {
+			grid-template-columns: 1fr;
+		}
+
+		.feature {
+			grid-template-columns: 1fr;
+			height: auto;
+			max-height: none;
+		}
+
+		.feature-media {
+			min-height: 10.5rem;
+			aspect-ratio: 16 / 9;
+			max-height: 12rem;
+		}
+
+		.feature-shade {
+			background: linear-gradient(
+				180deg,
+				transparent 40%,
+				color-mix(in srgb, var(--glass) 55%, transparent)
+			);
+		}
+
+		.category-cards {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

@@ -1,0 +1,6 @@
+/*
+  Giscus iframe 从 giscus.app 跨域拉取主题 CSS，生产环境需允许 CORS。
+  Netlify / Cloudflare Pages 等会读取此文件；纯 GitHub Pages 通常也能加载 stylesheet。
+*/
+/giscus/*
+  Access-Control-Allow-Origin: https://giscus.app

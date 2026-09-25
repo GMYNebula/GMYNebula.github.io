@@ -1,0 +1,105 @@
+---
+import TocTree from './TocTree.astro';
+
+export interface TocNode {
+	heading: { depth: number; slug: string; text: string };
+	children: TocNode[];
+}
+
+interface Props {
+	tree: TocNode[];
+	nested?: boolean;
+}
+
+const { tree, nested = false } = Astro.props;
+---
+
+<ol class:list={[!nested && 'toc-list', nested && 'toc-sub']}>
+	{
+		tree.map((node) => (
+			<li>
+				<a
+					class={`toc-d${node.heading.depth}`}
+					href={`#${node.heading.slug}`}
+					data-toc-link={node.heading.slug}
+				>
+					<span class="toc-text">{node.heading.text}</span>
+				</a>
+				{node.children.length > 0 && <TocTree tree={node.children} nested />}
+			</li>
+		))
+	}
+</ol>
+
+<style>
+	:global(.toc-list),
+	.toc-sub {
+		display: flex;
+		flex-direction: column;
+		gap: 0.12rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.toc-sub {
+		margin-top: 0.12rem;
+		margin-bottom: 0.2rem;
+		padding-left: 0.95rem;
+	}
+
+	:global(.toc-list a),
+	.toc-sub a {
+		display: block;
+		padding: 0.22rem 0.35rem 0.22rem 0.5rem;
+		border-left: 2px solid transparent;
+		text-decoration: none;
+		line-height: 1.45;
+		border-radius: 0.25rem;
+		transition:
+			color 0.15s ease,
+			border-color 0.15s ease,
+			background-color 0.15s ease;
+	}
+
+	:global(a.toc-d2) {
+		font-family: var(--font-display-stack);
+		font-size: 0.9rem;
+		font-weight: 650;
+		color: var(--ink);
+	}
+
+	:global(a.toc-d3) {
+		font-size: 0.84rem;
+		font-weight: 500;
+		color: var(--ink-soft);
+	}
+
+	:global(a.toc-d4),
+	:global(a.toc-d5) {
+		font-size: 0.82rem;
+		font-weight: 500;
+		color: var(--ink-soft);
+	}
+
+	:global(.toc-list a:hover),
+	:global(.toc-list a:focus-visible),
+	:global(.toc-list a.is-active),
+	.toc-sub a:hover,
+	.toc-sub a:focus-visible,
+	.toc-sub a.is-active {
+		color: var(--accent-deep);
+		border-left-color: var(--accent);
+		background: linear-gradient(90deg, var(--accent-glow), transparent 85%);
+		outline: none;
+	}
+
+	:global(.toc-list a.is-active),
+	.toc-sub a.is-active {
+		font-weight: 700;
+	}
+
+	:global(.toc-text) {
+		overflow-wrap: anywhere;
+	}
+</style>

@@ -1,0 +1,26 @@
+---
+description: 自研评论区 UI 与 Giscus 后端接入规范
+globs: src/components/Comments.astro,src/scripts/comments.ts,src/lib/giscus/**,src/styles/global.css,.cursor/skills/nicocat-comments/**
+alwaysApply: false
+---
+
+# 评论区
+
+完整说明见 skill **`nicocat-comments`**（`.cursor/skills/nicocat-comments/SKILL.md`）。
+
+## 硬约束
+
+- **禁止** Giscus iframe、`public/giscus/*.css`
+- `Comments.astro` + `comments.ts` + `src/lib/giscus/` + `global.css` 的 `.comments`
+- 评论正文容器：`class="comment-body prose"`，样式只写在 `.comments .prose`
+- dev：读讨论/OAuth 走 `/giscus-api`；GraphQL/REST 直连 GitHub
+
+## 当前能力
+
+排序（最新/最早）· 回复 · 表情（含楼中楼）· 删自己的 · 用户菜单内预览 · 相对时间
+
+**无**赞同/upvote · **无** giscus 品牌文案
+
+## 改完
+
+暗/亮各看一遍；列表/引用/代码/链接/表情/回复/删除正常。

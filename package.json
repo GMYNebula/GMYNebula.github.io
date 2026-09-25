@@ -7,18 +7,48 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "dev:clean": "node scripts/clean-vite-cache.mjs && astro dev --force",
+    "build": "astro build && npx --yes pagefind --site dist",
     "preview": "astro preview",
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/markdown-remark": "^7.3.0",
     "@astrojs/mdx": "^7.0.8",
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.3",
+    "@fontsource/fredoka": "^5.3.0",
+    "@fontsource/nunito": "^5.3.0",
+    "@fontsource/zcool-xiaowei": "^5.3.0",
+    "@rsalianto/git-heatmap-core": "^0.1.7",
+    "@rsalianto/git-heatmap-vanilla": "^0.1.7",
+    "@tsparticles/engine": "^4.4.0",
+    "@tsparticles/shape-image": "^4.4.0",
+    "@tsparticles/slim": "^4.4.0",
+    "@tsparticles/updater-roll": "^4.4.0",
+    "@tsparticles/updater-tilt": "^4.4.0",
+    "@tsparticles/updater-wobble": "^4.4.0",
     "astro": "^7.2.9",
-    "sharp": "^0.35.0"
+    "astro-expressive-code": "^0.44.2",
+    "katex": "^0.18.5",
+    "lxgw-wenkai-mono-gb-screen-webfont": "^1.0.1",
+    "matter-js": "^0.20.0",
+    "mermaid": "^11.17.2",
+    "rehype-accessible-emojis": "^0.3.2",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-external-links": "^3.0.0",
+    "rehype-katex": "^7.0.1",
+    "rehype-slug": "^6.0.0",
+    "remark-github-blockquote-alert": "^2.1.0",
+    "remark-math": "^6.0.0",
+    "remark-smartypants": "^3.0.3",
+    "sharp": "^0.35.0",
+    "simple-icons": "^16.29.0"
   },
   "allowScripts": {
     "esbuild": true
+  },
+  "devDependencies": {
+    "@types/matter-js": "^0.20.2"
   }
 }

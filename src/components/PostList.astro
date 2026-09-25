@@ -1,0 +1,240 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import CategoryChip from './CategoryChip.astro';
+import FormattedDate from './FormattedDate.astro';
+
+interface Props {
+	posts: CollectionEntry<'blog'>[];
+	variant?: 'card' | 'compact';
+}
+
+const { posts, variant = 'card' } = Astro.props;
+---
+
+{
+	variant === 'card' ? (
+		<ol class="post-list card">
+			{posts.map((post, i) => (
+				<li style={`--stagger:${i}`}>
+					<a class="glass" href={`/blog/${post.id}/`}>
+						{post.data.heroImage ? (
+							<span class="thumb">
+								<Image src={post.data.heroImage} alt="" width={440} height={280} />
+							</span>
+						) : (
+							<span class="thumb empty" />
+						)}
+						<span class="body">
+							<span class="title">{post.data.title}</span>
+							<span class="desc">{post.data.description}</span>
+							<span class="meta-row">
+								<time>
+									<FormattedDate date={post.data.pubDate} />
+								</time>
+								<span class="meta-sep" aria-hidden="true">·</span>
+								<CategoryChip
+									name={post.data.category}
+									variant="inline"
+									link={false}
+								/>
+							</span>
+						</span>
+					</a>
+				</li>
+			))}
+		</ol>
+	) : (
+		<ol class="post-list compact">
+			{posts.map((post, i) => (
+				<li style={`--stagger:${i}`}>
+					<a class="glass" href={`/blog/${post.id}/`}>
+						<span class="date-col">
+							<span class="date">
+								<FormattedDate date={post.data.pubDate} />
+							</span>
+							<CategoryChip
+								name={post.data.category}
+								variant="inline"
+								link={false}
+							/>
+						</span>
+						<span class="title">{post.data.title}</span>
+						<span class="arrow" aria-hidden="true">→</span>
+					</a>
+				</li>
+			))}
+		</ol>
+	)
+}
+
+<style>
+	.post-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 0.9rem;
+	}
+
+	.post-list a {
+		text-decoration: none;
+		color: inherit;
+		transition:
+			transform 0.25s ease,
+			background 0.25s ease,
+			border-color 0.25s ease;
+	}
+
+	/* ===== 卡片式 ===== */
+	.post-list.card a {
+		display: grid;
+		grid-template-columns: 13rem 1fr;
+		gap: 0;
+		align-items: stretch;
+		overflow: hidden;
+	}
+
+	.post-list.card a:hover {
+		transform: translateY(-3px);
+		background: var(--glass-strong);
+		border-color: var(--line-strong);
+	}
+
+	.thumb {
+		display: block;
+		overflow: hidden;
+		background: var(--bg-2);
+	}
+
+	.thumb :global(img) {
+		width: 100%;
+		height: 100%;
+		min-height: 9rem;
+		object-fit: cover;
+		transition: transform 0.5s ease;
+	}
+
+	.post-list a:hover .thumb :global(img) {
+		transform: scale(1.05);
+	}
+
+	.thumb.empty {
+		background: linear-gradient(135deg, var(--bg-2), rgba(232, 131, 107, 0.18));
+	}
+
+	.body {
+		display: grid;
+		align-content: center;
+		gap: 0.35rem;
+		padding: 1.1rem 1.25rem;
+	}
+
+	.meta-row {
+		display: inline-flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+		margin-top: 0.15rem;
+		font-size: 0.82rem;
+		font-weight: 600;
+		color: var(--muted);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.meta-row time {
+		color: var(--muted);
+	}
+
+	.meta-sep {
+		opacity: 0.45;
+		user-select: none;
+	}
+
+	.title {
+		display: block;
+		font-family: var(--font-display-stack);
+		font-weight: 700;
+		letter-spacing: -0.02em;
+	}
+
+	.card .title {
+		font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+	}
+
+	.compact .title {
+		font-size: 1.1rem;
+	}
+
+	.desc {
+		display: block;
+		color: var(--ink-soft);
+		font-size: 0.95rem;
+		max-width: 46ch;
+		line-height: 1.45;
+	}
+
+	.post-list a:hover .title {
+		color: var(--accent);
+	}
+
+	/* ===== 紧凑式 ===== */
+	.post-list.compact a {
+		display: grid;
+		grid-template-columns: 7rem 1fr auto;
+		align-items: center;
+		gap: 1rem;
+		padding: 0.85rem 1.15rem;
+	}
+
+	.date-col {
+		display: grid;
+		gap: 0.15rem;
+		align-content: center;
+	}
+
+	.date {
+		display: block;
+		font-size: 0.82rem;
+		font-weight: 600;
+		color: var(--muted);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.post-list.compact a:hover {
+		transform: translateX(4px);
+		background: var(--glass-strong);
+		border-color: var(--line-strong);
+	}
+
+	.arrow {
+		color: var(--muted);
+		transition:
+			transform 0.22s ease,
+			color 0.22s ease;
+	}
+
+	.post-list.compact a:hover .arrow {
+		transform: translateX(3px);
+		color: var(--accent);
+	}
+
+	@media (max-width: 700px) {
+		.post-list.card a {
+			grid-template-columns: 1fr;
+		}
+
+		.thumb :global(img) {
+			min-height: 0;
+			aspect-ratio: 16 / 9;
+		}
+
+		.post-list.compact a {
+			grid-template-columns: 1fr auto;
+		}
+
+		.date-col {
+			display: none;
+		}
+	}
+</style>

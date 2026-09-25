@@ -1,0 +1,255 @@
+/*!
+ * Giscus · 星云可可の小窝 · 亮色
+ */
+main {
+	--primary-default: 196, 75, 47;
+	--color-canvas-default: transparent;
+	--color-canvas-overlay: rgba(255, 255, 255, 0.92);
+	--color-canvas-inset: #eef1f4;
+	--color-canvas-subtle: rgba(255, 255, 255, 0.88);
+	--color-border-default: rgba(18, 20, 23, 0.12);
+	--color-border-muted: rgba(18, 20, 23, 0.08);
+	--color-fg-default: #171a1e;
+	--color-fg-muted: #5a626c;
+	--color-fg-subtle: #7a828c;
+	--color-accent-fg: #9a3722;
+	--color-accent-emphasis: #c44b2f;
+	--color-accent-muted: rgba(196, 75, 47, 0.35);
+	--color-accent-subtle: rgba(196, 75, 47, 0.1);
+	--color-btn-text: #171a1e;
+	--color-btn-bg: rgba(18, 20, 23, 0.05);
+	--color-btn-border: rgba(18, 20, 23, 0.1);
+	--color-btn-hover-bg: rgba(18, 20, 23, 0.08);
+	--color-btn-primary-text: #fff;
+	--color-btn-primary-bg: rgba(196, 75, 47, 0.92);
+	--color-btn-primary-border: rgba(196, 75, 47, 0.45);
+	--color-btn-primary-hover-bg: #9a3722;
+	--color-btn-primary-hover-border: rgba(154, 55, 34, 0.55);
+	--color-neutral-muted: rgba(18, 20, 23, 0.06);
+	--color-segmented-control-bg: rgba(18, 20, 23, 0.05);
+	--color-segmented-control-button-bg: transparent;
+	--color-segmented-control-button-selected-border: rgba(196, 75, 47, 0.4);
+}
+
+main .gsc-homepage-bg,
+.gsc-main {
+	background: transparent !important;
+}
+
+.gsc-comments {
+	position: relative;
+	padding: 1rem 1.15rem 1.2rem !important;
+	border: 1px solid rgba(18, 20, 23, 0.12) !important;
+	border-radius: 0.85rem !important;
+	background: rgba(255, 255, 255, 0.78) !important;
+	backdrop-filter: blur(16px) saturate(1.08) !important;
+	-webkit-backdrop-filter: blur(16px) saturate(1.08) !important;
+	box-shadow: 0 8px 24px rgba(18, 20, 23, 0.06) !important;
+}
+
+.gsc-header {
+	display: flex !important;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 0.5rem 0.75rem;
+	padding: 0 0 0.75rem !important;
+	margin: 0 0 0.85rem !important;
+	border-bottom: 1px solid rgba(18, 20, 23, 0.1) !important;
+	background: transparent !important;
+}
+
+.gsc-header .Link--primary,
+.gsc-header a.Link--primary {
+	color: rgb(var(--primary-default)) !important;
+	font-weight: 600 !important;
+	text-decoration: underline dotted !important;
+	text-underline-offset: 0.22em !important;
+}
+
+.gsc-header .color-fg-muted,
+.gsc-header .Link--secondary {
+	color: var(--color-fg-muted) !important;
+	font-size: 0.88rem !important;
+}
+
+/* 隐藏「– 由 giscus 提供支持」 */
+.gsc-left-header em.color-text-secondary {
+	display: none !important;
+}
+
+.gsc-reactions,
+.gsc-reactions-count,
+.gsc-updown-vote {
+	display: none !important;
+}
+
+.gsc-comment-box {
+	border: none !important;
+	background: transparent !important;
+	padding: 0 !important;
+	margin-bottom: 0.85rem !important;
+}
+
+.gsc-comment-box-main {
+	display: flex !important;
+	align-items: flex-start !important;
+	gap: 0.7rem !important;
+	width: 100% !important;
+	background: transparent !important;
+	border: none !important;
+}
+
+.gsc-comment-box-main .gsc-avatar,
+.gsc-comment-box-main .gsc-comment-box-avatar {
+	flex: 0 0 auto;
+}
+
+.gsc-comment-box-content {
+	flex: 1 1 0 !important;
+	min-width: 0 !important;
+	width: 100% !important;
+	max-width: 100% !important;
+}
+
+.gsc-comment-box-tabs {
+	display: flex !important;
+	gap: 0.45rem !important;
+	margin: 0 0 0.45rem !important;
+	padding: 0 !important;
+	border: none !important;
+	background: transparent !important;
+}
+
+.gsc-comment-box-tabs button {
+	border-radius: 999px !important;
+	padding: 0.35rem 0.9rem !important;
+	font-size: 0.82rem !important;
+	font-weight: 600 !important;
+	border: 1px solid rgba(196, 75, 47, 0.4) !important;
+	background: rgba(196, 75, 47, 0.22) !important;
+	color: #fff !important;
+}
+
+.gsc-comment-box-tabs button.selected {
+	background: rgba(196, 75, 47, 0.48) !important;
+}
+
+.gsc-comment-box-textarea,
+.gsc-comment-box .markdown-body {
+	display: block !important;
+	width: 100% !important;
+	max-width: 100% !important;
+	box-sizing: border-box !important;
+}
+
+.gsc-comment-box-textarea {
+	min-height: 5.5rem !important;
+	padding: 0.75rem 0.95rem !important;
+	border-radius: 1rem !important;
+	border: 1px solid rgba(18, 20, 23, 0.14) !important;
+	background: rgba(255, 255, 255, 0.88) !important;
+	font-size: 0.95rem !important;
+	color: var(--color-fg-default) !important;
+	resize: vertical !important;
+}
+
+.gsc-comment-box-textarea:focus {
+	border-color: rgba(196, 75, 47, 0.45) !important;
+	box-shadow: 0 0 0 3px rgba(196, 75, 47, 0.12) !important;
+}
+
+.gsc-comment-box-tools {
+	display: flex !important;
+	align-items: center !important;
+	margin: 0.45rem 0 0 !important;
+	padding: 0 !important;
+	border: none !important;
+	background: transparent !important;
+	color: rgba(154, 55, 34, 0.92) !important;
+	font-size: 0.8rem !important;
+}
+
+.gsc-comment-box-footer {
+	display: flex !important;
+	align-items: center !important;
+	justify-content: space-between !important;
+	gap: 0.65rem !important;
+	margin: 0.5rem 0 0 !important;
+	padding: 0 !important;
+	border: none !important;
+	background: transparent !important;
+}
+
+.gsc-comment-box-footer .Link--secondary {
+	font-size: 0.82rem !important;
+	color: var(--color-fg-muted) !important;
+}
+
+.gsc-comment-box-footer .Link--primary,
+.gsc-comment-box-footer button[type='submit'],
+.gsc-comment-box-footer .btn-primary {
+	border-radius: 999px !important;
+	padding: 0.4rem 1.05rem !important;
+	font-size: 0.82rem !important;
+	font-weight: 600 !important;
+	border: 1px solid rgba(196, 75, 47, 0.45) !important;
+	background: rgba(196, 75, 47, 0.52) !important;
+	color: #fff !important;
+	box-shadow: 0 0 12px rgba(196, 75, 47, 0.18) !important;
+}
+
+.gsc-comment-author-avatar img,
+.gsc-comment-box-main .gsc-avatar img {
+	border-radius: 999px !important;
+	border: 1px solid rgba(18, 20, 23, 0.1) !important;
+}
+
+.gsc-timeline {
+	margin-top: 0.35rem !important;
+}
+
+.gsc-timeline:not(:has(.gsc-comment)) {
+	text-align: center !important;
+	padding: 0.75rem 0 0.25rem !important;
+	color: var(--color-fg-muted) !important;
+	font-size: 0.92rem !important;
+}
+
+.gsc-timeline-comment,
+.gsc-comment {
+	border: 1px solid rgba(18, 20, 23, 0.1) !important;
+	border-radius: 0.75rem !important;
+	background: rgba(255, 255, 255, 0.72) !important;
+	padding: 0.75rem 0.85rem !important;
+	margin-bottom: 0.65rem !important;
+}
+
+.gsc-comment .gsc-comment {
+	margin-left: 0.85rem !important;
+	padding-left: 0.65rem !important;
+	border-left: 1px solid rgba(18, 20, 23, 0.1) !important;
+	border-radius: 0 !important;
+	background: transparent !important;
+	box-shadow: none !important;
+}
+
+.gsc-reply-box {
+	border: 1px solid rgba(18, 20, 23, 0.1) !important;
+	border-radius: 0.65rem !important;
+	background: rgba(255, 255, 255, 0.68) !important;
+	margin-top: 0.55rem !important;
+	padding: 0.55rem 0.65rem !important;
+}
+
+.gsc-reply-box .gsc-comment-box-textarea {
+	min-height: 3.5rem !important;
+	font-size: 0.88rem !important;
+	border-radius: 0.75rem !important;
+}
+
+.gsc-reply-box .gsc-comment-box-content {
+	flex: 1 1 auto !important;
+	min-width: 0 !important;
+	width: 100% !important;
+}

@@ -1,0 +1,415 @@
+---
+import { Image } from 'astro:assets';
+import CategoryChip from './CategoryChip.astro';
+import FormattedDate from './FormattedDate.astro';
+import { getCategoryMeta } from '../data/categories';
+import type { ArchiveYear } from '../utils/archives';
+
+interface Props {
+	archives: ArchiveYear[];
+}
+
+const { archives } = Astro.props;
+
+let itemIndex = 0;
+---
+
+<div class="timeline">
+	<div class="axis" aria-hidden="true" />
+
+	{
+		archives.map((yearBlock) => (
+			<section class="year-block">
+				<header class="year-head">
+					<span class="year-node" aria-hidden="true" />
+					<div class="year-copy">
+						<h2>{yearBlock.year}</h2>
+						<span>{yearBlock.count} 篇</span>
+					</div>
+				</header>
+
+				{yearBlock.months.map((monthBlock) => (
+					<div class="month-block">
+						<div class="month-head">
+							<span class="month-name">{monthBlock.label}</span>
+							<span class="month-line" aria-hidden="true" />
+						</div>
+
+						<ul class="post-stack">
+							{monthBlock.posts.map((post) => {
+								const meta = getCategoryMeta(post.data.category);
+								const tone = meta?.tone ?? 'coral';
+								const delay = itemIndex++;
+								return (
+									<li class={`post-card tone-${tone}`} data-reveal style={`--i:${delay};--stagger:${delay}`}>
+										<span class="post-node" aria-hidden="true" />
+										<a class="post-link glass" href={`/blog/${post.id}/`}>
+											{post.data.heroImage ? (
+												<span class="thumb">
+													<Image
+														src={post.data.heroImage}
+														alt=""
+														width={320}
+														height={200}
+													/>
+												</span>
+											) : (
+												<span class="thumb thumb-fallback" aria-hidden="true" />
+											)}
+											<span class="post-body">
+												<span class="post-title">{post.data.title}</span>
+												{post.data.description && (
+													<span class="post-desc">{post.data.description}</span>
+												)}
+												<span class="post-meta">
+													<time>
+														<FormattedDate date={post.data.pubDate} mode="date" />
+													</time>
+													<span class="meta-sep" aria-hidden="true">·</span>
+													<CategoryChip
+														name={post.data.category}
+														variant="inline"
+														link={false}
+													/>
+												</span>
+											</span>
+											<span class="post-arrow" aria-hidden="true">→</span>
+										</a>
+									</li>
+								);
+							})}
+						</ul>
+					</div>
+				))}
+			</section>
+		))
+	}
+</div>
+
+<style>
+	.timeline {
+		--axis-x: 1.1rem;
+		--content-pad: 2.65rem;
+		--branch: 1.1rem;
+		position: relative;
+		padding-left: var(--content-pad);
+	}
+
+	.axis {
+		position: absolute;
+		left: var(--axis-x);
+		top: 0.75rem;
+		bottom: 0.75rem;
+		width: 2px;
+		transform: translateX(-50%);
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--line-strong) 70%, var(--accent) 30%);
+		box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 15%, transparent);
+	}
+
+	.year-block {
+		position: relative;
+		margin-bottom: 2.5rem;
+	}
+
+	.year-block:last-child {
+		margin-bottom: 0;
+	}
+
+	.year-head {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		margin: 0 0 1.5rem;
+	}
+
+	.year-node {
+		position: absolute;
+		left: calc(var(--axis-x) - var(--content-pad));
+		translate: -50% 0;
+		width: 0.85rem;
+		height: 0.85rem;
+		border-radius: 999px;
+		background: var(--accent);
+		border: 3px solid var(--bg);
+		box-shadow:
+			0 0 0 1px color-mix(in srgb, var(--accent) 50%, var(--line)),
+			0 0 16px color-mix(in srgb, var(--accent-glow) 100%, transparent);
+	}
+
+	.year-copy {
+		display: flex;
+		align-items: baseline;
+		gap: 0.65rem;
+		min-width: 0;
+	}
+
+	.year-copy h2 {
+		margin: 0;
+		font-family: var(--font-display-stack);
+		font-size: clamp(1.85rem, 3.8vw, 2.2rem);
+		font-weight: 700;
+		letter-spacing: -0.03em;
+		line-height: 1;
+		color: var(--ink);
+	}
+
+	.year-copy span {
+		font-size: 0.86rem;
+		font-weight: 700;
+		color: var(--ink-soft);
+	}
+
+	.month-block {
+		margin-bottom: 1.5rem;
+	}
+
+	.month-block:last-child {
+		margin-bottom: 0;
+	}
+
+	.month-head {
+		display: flex;
+		align-items: center;
+		gap: 0.65rem;
+		margin: 0 0 0.75rem;
+		padding-left: 0.1rem;
+	}
+
+	.month-name {
+		font-family: var(--font-display-stack);
+		font-size: 1rem;
+		font-weight: 700;
+		color: var(--ink);
+		white-space: nowrap;
+	}
+
+	.month-line {
+		flex: 1;
+		height: 1px;
+		margin-left: 0.25rem;
+		background: linear-gradient(
+			90deg,
+			color-mix(in srgb, var(--line-strong) 80%, var(--accent) 20%),
+			transparent 95%
+		);
+	}
+
+	.post-stack {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 0.7rem;
+	}
+
+	.post-card {
+		position: relative;
+		animation: rise 0.55s ease both;
+		animation-delay: calc(var(--i) * 50ms);
+	}
+
+	.post-node {
+		position: absolute;
+		left: calc(var(--axis-x) - var(--content-pad));
+		top: 50%;
+		translate: -50% -50%;
+		width: 0.48rem;
+		height: 0.48rem;
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--tone) 80%, var(--accent));
+		border: 2px solid var(--bg);
+		box-shadow: 0 0 0 1px color-mix(in srgb, var(--tone) 50%, var(--line));
+		transition:
+			transform 0.2s ease,
+			background 0.2s ease,
+			box-shadow 0.2s ease;
+		z-index: 1;
+	}
+
+	.post-card::before {
+		content: '';
+		position: absolute;
+		left: calc(var(--axis-x) - var(--content-pad));
+		top: 50%;
+		width: var(--branch);
+		height: 1px;
+		translate: 0 -50%;
+		background: color-mix(in srgb, var(--line-strong) 75%, var(--tone) 25%);
+		transition: background 0.2s ease;
+	}
+
+	.post-link {
+		display: grid;
+		grid-template-columns: 12rem 1fr auto;
+		align-items: stretch;
+		gap: 0;
+		margin-left: var(--branch);
+		padding: 0;
+		overflow: hidden;
+		text-decoration: none;
+		color: inherit;
+		background: color-mix(in srgb, var(--glass-strong) 75%, transparent);
+		border: 1px solid var(--line);
+		border-left: 3px solid color-mix(in srgb, var(--tone) 70%, var(--accent));
+		transition:
+			transform 0.25s ease,
+			border-color 0.25s ease,
+			box-shadow 0.25s ease,
+			background 0.25s ease;
+	}
+
+	.post-link:hover {
+		transform: translateX(4px);
+		border-color: color-mix(in srgb, var(--tone) 45%, var(--line-strong));
+		border-left-color: color-mix(in srgb, var(--tone) 90%, var(--accent));
+		background: color-mix(in srgb, var(--glass-strong) 95%, transparent);
+		box-shadow: 0 10px 28px color-mix(in srgb, var(--tone) 16%, transparent);
+	}
+
+	.post-card:has(.post-link:hover) .post-node {
+		transform: scale(1.3);
+		background: color-mix(in srgb, var(--tone) 75%, var(--accent));
+		box-shadow: 0 0 10px color-mix(in srgb, var(--tone) 30%, transparent);
+	}
+
+	.post-card:has(.post-link:hover)::before {
+		background: color-mix(in srgb, var(--tone) 40%, var(--line));
+	}
+
+	.thumb {
+		display: block;
+		overflow: hidden;
+		background: var(--bg-2);
+		min-height: 6.75rem;
+	}
+
+	.thumb :global(img) {
+		width: 100%;
+		height: 100%;
+		min-height: 6.75rem;
+		object-fit: cover;
+		transition: transform 0.45s ease;
+	}
+
+	.post-link:hover .thumb :global(img) {
+		transform: scale(1.05);
+	}
+
+	.thumb-fallback {
+		background: linear-gradient(
+			145deg,
+			color-mix(in srgb, var(--tone) 18%, var(--bg-2)),
+			color-mix(in srgb, var(--tone) 6%, var(--glass))
+		);
+	}
+
+	.post-body {
+		display: grid;
+		align-content: center;
+		gap: 0.28rem;
+		padding: 0.9rem 1rem;
+		min-width: 0;
+	}
+
+	.post-title {
+		font-family: var(--font-display-stack);
+		font-size: 1.08rem;
+		font-weight: 700;
+		line-height: 1.35;
+		letter-spacing: -0.02em;
+		color: var(--ink);
+		transition: color 0.2s ease;
+	}
+
+	.post-link:hover .post-title {
+		color: var(--accent-deep);
+	}
+
+	.post-desc {
+		font-size: 0.88rem;
+		line-height: 1.45;
+		color: var(--ink-soft);
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	.post-meta {
+		display: inline-flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+		margin-top: 0.2rem;
+		font-size: 0.82rem;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.post-meta time {
+		color: var(--muted);
+	}
+
+	.meta-sep {
+		opacity: 0.45;
+		user-select: none;
+	}
+
+	.post-arrow {
+		display: grid;
+		place-items: center;
+		padding: 0 0.85rem;
+		font-size: 1.1rem;
+		color: var(--muted);
+		opacity: 0;
+		transform: translateX(-4px);
+		transition:
+			opacity 0.2s ease,
+			transform 0.2s ease,
+			color 0.2s ease;
+	}
+
+	.post-link:hover .post-arrow {
+		opacity: 1;
+		transform: translateX(0);
+		color: var(--accent);
+	}
+
+	.tone-coral {
+		--tone: #f0a48e;
+	}
+	.tone-teal {
+		--tone: #7fc4b5;
+	}
+	.tone-amber {
+		--tone: #e6c07b;
+	}
+
+	@media (max-width: 640px) {
+		.timeline {
+			--content-pad: 2.2rem;
+			--branch: 0.75rem;
+		}
+
+		.post-link {
+			grid-template-columns: 1fr;
+		}
+
+		.thumb,
+		.thumb :global(img) {
+			min-height: 0;
+			aspect-ratio: 16 / 9;
+		}
+
+		.post-arrow {
+			display: none;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.post-card {
+			animation: none;
+		}
+	}
+</style>

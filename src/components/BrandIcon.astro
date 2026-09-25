@@ -1,0 +1,37 @@
+---
+/**
+ * 品牌图标来自 Simple Icons (CC0)：https://simpleicons.org
+ * UI 操作图标仍用 Icon.astro（Lucide）。
+ */
+import { siBilibili, siCsdn, siGithub, siQq, siWechat } from 'simple-icons';
+
+export type BrandName = 'github' | 'bilibili' | 'csdn' | 'qq' | 'wechat';
+
+interface Props {
+	name: BrandName;
+	size?: number;
+	class?: string;
+}
+
+const brands = {
+	github: siGithub,
+	bilibili: siBilibili,
+	csdn: siCsdn,
+	qq: siQq,
+	wechat: siWechat,
+} as const;
+
+const { name, size = 20, class: className } = Astro.props;
+const brand = brands[name];
+---
+
+<svg
+	class={className}
+	width={size}
+	height={size}
+	viewBox="0 0 24 24"
+	fill="currentColor"
+	aria-hidden="true"
+>
+	<path d={brand.path} />
+</svg>

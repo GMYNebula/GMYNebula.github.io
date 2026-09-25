@@ -1,9 +1,11 @@
 ---
-import { type CollectionEntry, getCollection, render } from 'astro:content';
+import { type CollectionEntry, render } from 'astro:content';
 import BlogPost from '../../layouts/BlogPost.astro';
+import { getAdjacentPosts, getPublishedPosts } from '../../utils/posts';
+import { countArticleWords } from '../../utils/word-count';
 
 export async function getStaticPaths() {
-	const posts = await getCollection('blog');
+	const posts = await getPublishedPosts();
 	return posts.map((post) => ({
 		params: { slug: post.id },
 		props: post,
@@ -12,9 +14,19 @@ export async function getStaticPaths() {
 type Props = CollectionEntry<'blog'>;
 
 const post = Astro.props;
-const { Content } = await render(post);
+const posts = await getPublishedPosts();
+const { prev, next } = getAdjacentPosts(posts, post.id);
+const { Content, headings } = await render(post);
+const wordCount = countArticleWords(post.body ?? '');
+const articleHeadings = headings.map((h) => ({
+	...h,
+	depth: Math.min(h.depth + 1, 6),
+}));
+
+const prevNav = prev ? { title: prev.data.title, href: `/blog/${prev.id}/` } : null;
+const nextNav = next ? { title: next.data.title, href: `/blog/${next.id}/` } : null;
 ---
 
-<BlogPost {...post.data}>
+<BlogPost {...post.data} headings={articleHeadings} wordCount={wordCount} prev={prevNav} next={nextNav}>
 	<Content />
 </BlogPost>

@@ -2,85 +2,352 @@
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
+import Comments from '../components/Comments.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
+import Icon from '../components/Icon.astro';
+import PostLicense from '../components/PostLicense.astro';
+import PostNav from '../components/PostNav.astro';
+import ReadingProgress from '../components/ReadingProgress.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import { getCategoryMeta } from '../data/categories';
+import { categoryToSlug, topicTags } from '../utils/categories';
+import { tagToSlug } from '../utils/tags';
+import { formatWordCount } from '../utils/word-count';
 
-type Props = CollectionEntry<'blog'>['data'];
+interface NavItem {
+	title: string;
+	href: string;
+}
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+type Props = CollectionEntry<'blog'>['data'] & {
+	headings?: { depth: number; slug: string; text: string }[];
+	wordCount?: number;
+	prev?: NavItem | null;
+	next?: NavItem | null;
+};
+
+const {
+	title,
+	description,
+	pubDate,
+	updatedDate,
+	heroImage,
+	tags,
+	category,
+	headings = [],
+	wordCount = 0,
+	prev = null,
+	next = null,
+	license = true,
+} = Astro.props;
+
+const tocCount = headings.filter((h) => h.depth >= 2 && h.depth <= 5).length;
+const hasToc = tocCount >= 2;
+const categoryMeta = getCategoryMeta(category);
+const displayTags = categoryMeta ? topicTags(tags, categoryMeta.name) : tags;
 ---
 
-<html lang="en">
+<html lang="zh-CN">
 	<head>
-		<BaseHead title={title} description={description} />
-		<style>
-			main {
-				width: calc(100% - 2em);
-				max-width: 100%;
-				margin: 0;
-			}
-			.hero-image {
-				width: 100%;
-			}
-			.hero-image img {
-				display: block;
-				margin: 0 auto;
-				border-radius: 12px;
-				box-shadow: var(--box-shadow);
-			}
-			.prose {
-				width: 720px;
-				max-width: calc(100% - 2em);
-				margin: auto;
-				padding: 1em;
-				color: rgb(var(--gray-dark));
-			}
-			.title {
-				margin-bottom: 1em;
-				padding: 1em 0;
-				text-align: center;
-				line-height: 1;
-			}
-			.title h1 {
-				margin: 0 0 0.5em 0;
-			}
-			.date {
-				margin-bottom: 0.5em;
-				color: rgb(var(--gray));
-			}
-			.last-updated-on {
-				font-style: italic;
-			}
-		</style>
+		<BaseHead title={title} description={description} image={heroImage} />
 	</head>
 
 	<body>
+		<ReadingProgress />
 		<Header />
 		<main>
-			<article>
-				<div class="hero-image">
-					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
-				</div>
-				<div class="prose">
-					<div class="title">
-						<div class="date">
-							<FormattedDate date={pubDate} />
+			<article data-pagefind-body>
+				<div class="post-stage">
+					<div class:list={['shell', hasToc && 'has-toc']}>
+						<div class="layout">
+							<div class="main-col">
+								<article class:list={['article-card', 'glass', 'prose', heroImage && 'has-hero']}>
+									{
+										heroImage && (
+											<div class="hero-image">
+												<Image
+													width={1400}
+													height={700}
+													src={heroImage}
+													alt=""
+													loading="eager"
+													fetchpriority="high"
+												/>
+											</div>
+										)
+									}
+									<div class="article-inner">
+										<header class="title">
+											<h1>{title}</h1>
+											<div class="title-meta">
+												<span class="post-chip">
+													<Icon name="calendar" size={13} />
+													<FormattedDate date={pubDate} mode="datetime" />
+												</span>
+												{
+													wordCount > 0 && (
+														<span class="post-chip">
+															<Icon name="file-text" size={13} />
+															<span>{formatWordCount(wordCount)}</span>
+														</span>
+													)
+												}
+												{
+													categoryMeta && (
+														<a
+															class="post-chip post-chip--category"
+															href={`/categories/${categoryToSlug(categoryMeta.name)}/`}
+														>
+															<Icon name={categoryMeta.icon} size={13} />
+															<span>{categoryMeta.name}</span>
+														</a>
+													)
+												}
+												{
+													displayTags.map((tag) => (
+														<a class="post-chip" href={`/tags/${tagToSlug(tag)}/`}>
+															<Icon name="tag" size={13} />
+															<span>{tag}</span>
+														</a>
+													))
+												}
+												{
+													updatedDate && (
+														<span class="post-chip post-chip--muted">
+															更新 <FormattedDate date={updatedDate} mode="datetime" />
+														</span>
+													)
+												}
+											</div>
+											{description && <p class="dek">{description}</p>}
+										</header>
+
+										<section class="content">
+											<slot />
+										</section>
+
+										{license && <PostLicense title={title} pubDate={pubDate} />}
+									</div>
+								</article>
+
+								<PostNav prev={prev} next={next} />
+
+								<section class="comments-zone" data-pagefind-ignore>
+									<Comments />
+								</section>
+							</div>
+
 							{
-								updatedDate && (
-									<div class="last-updated-on">
-										Last updated on <FormattedDate date={updatedDate} />
+								hasToc && (
+									<div class="toc-col">
+										<TableOfContents headings={headings} />
 									</div>
 								)
 							}
 						</div>
-						<h1>{title}</h1>
-						<hr />
 					</div>
-					<slot />
 				</div>
 			</article>
 		</main>
 		<Footer />
+		<script>
+			import { bootArticleEnhancements } from '../scripts/article-enhancements.ts';
+			bootArticleEnhancements();
+		</script>
 	</body>
 </html>
+
+<style>
+	main {
+		padding-bottom: 2rem;
+	}
+
+	.shell {
+		width: min(var(--article-shell), calc(100% - 2.5rem));
+		margin: 0 auto;
+		padding: 2rem 0 3.5rem;
+		animation: fade-in 0.7s ease 0.08s both;
+	}
+
+	.layout {
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+	}
+
+	.main-col {
+		min-width: 0;
+		position: relative;
+		z-index: 1;
+	}
+
+	.toc-col {
+		min-width: 0;
+	}
+
+	@media (max-width: 1279px) {
+		.toc-col {
+			order: -1;
+		}
+	}
+
+	.article-card {
+		overflow: hidden;
+	}
+
+	.article-card:not(.has-hero) {
+		padding: 1.85rem 1.9rem 1.6rem;
+	}
+
+	.article-card.has-hero {
+		padding: 0;
+	}
+
+	.article-card.has-hero .hero-image {
+		margin: -1px -1px 0;
+		width: calc(100% + 2px);
+		max-width: none;
+	}
+
+	.hero-image {
+		position: relative;
+		width: 100%;
+		max-height: min(38vh, 320px);
+		margin: 0;
+		line-height: 0;
+		overflow: hidden;
+		border-bottom: 1px solid var(--line);
+	}
+
+	.hero-image :global(picture) {
+		display: block;
+		margin: 0;
+		line-height: 0;
+	}
+
+	.hero-image :global(img) {
+		width: 100%;
+		height: min(38vh, 320px);
+		margin: 0;
+		padding: 0;
+		border: none;
+		border-radius: 0;
+		object-fit: cover;
+		object-position: center 40%;
+		display: block;
+		vertical-align: top;
+	}
+
+	.article-inner {
+		padding: 1.65rem 1.9rem 1.6rem;
+	}
+
+	.title {
+		margin-bottom: 1.5rem;
+		padding-bottom: 1.25rem;
+		border-bottom: 1px solid var(--line);
+	}
+
+	.title-meta {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: flex-start;
+		align-items: center;
+		gap: 0.45rem 0.55rem;
+		margin: 0.55rem 0 0.85rem;
+	}
+
+	.post-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		padding: 0.32rem 0.72rem;
+		border: 1px solid var(--line);
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--glass) 88%, transparent);
+		color: var(--muted);
+		font-size: 0.82rem;
+		line-height: 1.2;
+		font-weight: 500;
+		font-variant-numeric: tabular-nums;
+		text-decoration: none;
+	}
+
+	a.post-chip {
+		color: var(--ink-soft);
+	}
+
+	a.post-chip:hover {
+		border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+		background: var(--accent-glow);
+		color: var(--accent-deep);
+	}
+
+	.post-chip--category {
+		color: var(--ink-soft);
+		border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+		background: color-mix(in srgb, var(--accent-glow) 55%, transparent);
+	}
+
+	a.post-chip--category:hover {
+		border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+		background: color-mix(in srgb, var(--accent-glow) 85%, transparent);
+	}
+
+	.post-chip :global(svg) {
+		flex-shrink: 0;
+		opacity: 0.72;
+		color: var(--accent-deep);
+	}
+
+	.post-chip--muted {
+		background: transparent;
+		border-style: dashed;
+	}
+
+	.title h1 {
+		margin: 0;
+		font-size: clamp(1.6rem, 3.2vw, 2rem);
+		font-weight: 600;
+		line-height: 1.3;
+		color: var(--ink);
+	}
+
+	.dek {
+		margin: 0;
+		font-size: 0.98rem;
+		color: var(--muted);
+		max-width: none;
+		line-height: 1.55;
+	}
+
+	.content {
+		margin-bottom: 0;
+	}
+
+	.comments-zone {
+		width: 100%;
+		max-width: 100%;
+		margin-top: 0.25rem;
+	}
+
+	@media (max-width: 640px) {
+		.hero-image {
+			max-height: min(34vh, 240px);
+		}
+
+		.hero-image :global(img) {
+			height: min(34vh, 240px);
+		}
+
+		.article-inner {
+			padding: 1.35rem 1.15rem 1.35rem;
+		}
+
+		.article-card:not(.has-hero) {
+			padding: 1.35rem 1.15rem 1.35rem;
+		}
+	}
+</style>

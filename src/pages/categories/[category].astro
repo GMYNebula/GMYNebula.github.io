@@ -1,0 +1,265 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import Icon from '../../components/Icon.astro';
+import PostList from '../../components/PostList.astro';
+import { getCategoryMeta, isCategoryName } from '../../data/categories';
+import { SITE_TITLE } from '../../consts';
+import { getAllCategories, getPostsByCategory, resolveCategory } from '../../utils/categories';
+
+export async function getStaticPaths() {
+	const items = await getAllCategories();
+	return items.map((cat) => ({
+		params: { category: cat.name },
+		props: {
+			categoryName: cat.name,
+		},
+	}));
+}
+
+const { categoryName } = Astro.props;
+const displayName = resolveCategory(Astro.params.category!) ?? categoryName;
+const meta = getCategoryMeta(displayName ?? categoryName);
+const posts = isCategoryName(displayName ?? categoryName)
+	? await getPostsByCategory(displayName ?? categoryName)
+	: [];
+const allCats = await getAllCategories();
+const tone = meta?.tone ?? 'coral';
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead
+			title={`${displayName} · 分类 · ${SITE_TITLE}`}
+			description={meta?.description ?? displayName}
+		/>
+	</head>
+	<body>
+		<Header />
+		<main class="page">
+			<a class="back" href="/categories">
+				<Icon name="arrow" size={14} />
+				全部分类
+			</a>
+
+			<header class={`hero glass tone-${tone}`}>
+				<div class="hero-icon" aria-hidden="true">
+					{meta && <Icon name={meta.icon} size={32} />}
+				</div>
+				<div class="hero-copy">
+					<p class="eyebrow">Category</p>
+					<h1>{displayName}</h1>
+					<p class="desc">{meta?.description ?? ''}</p>
+					<p class="count">{posts.length} 篇文章</p>
+				</div>
+			</header>
+
+			<nav class="cat-nav" aria-label="切换分类">
+				{
+					allCats.map((cat) => (
+						<a
+							class={`cat-tab tone-${cat.tone}${cat.name === displayName ? ' active' : ''}`}
+							href={`/categories/${cat.name}/`}
+							aria-current={cat.name === displayName ? 'page' : undefined}
+						>
+							<Icon name={cat.icon} size={14} />
+							{cat.name}
+							<span class="tab-count">{cat.count}</span>
+						</a>
+					))
+				}
+			</nav>
+
+			<section class="posts-section">
+				{posts.length === 0 ? (
+					<p class="empty glass">这个分类还没有文章喵～</p>
+				) : (
+					<PostList posts={posts} variant="card" />
+				)}
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.page {
+		width: min(920px, calc(100% - 2.5rem));
+		margin: 0 auto;
+		padding-top: 2rem;
+		padding-bottom: 4.5rem;
+	}
+
+	.back {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		margin-bottom: 1.15rem;
+		font-size: 0.88rem;
+		font-weight: 700;
+		color: var(--muted);
+		text-decoration: none;
+		transition: color 0.15s ease;
+	}
+
+	.back :global(svg) {
+		rotate: 180deg;
+	}
+
+	.back:hover {
+		color: var(--accent-deep);
+	}
+
+	.hero {
+		position: relative;
+		display: grid;
+		grid-template-columns: auto 1fr;
+		align-items: center;
+		gap: 1.25rem 1.5rem;
+		padding: 1.65rem 1.75rem;
+		margin-bottom: 1.25rem;
+		overflow: hidden;
+		border-top: 3px solid color-mix(in srgb, var(--tone) 75%, var(--line));
+		animation: rise 0.55s ease both;
+	}
+
+	.hero-icon {
+		display: grid;
+		place-items: center;
+		width: 4.25rem;
+		height: 4.25rem;
+		border-radius: 1.1rem;
+		color: color-mix(in srgb, var(--tone) 88%, var(--ink));
+		background: color-mix(in srgb, var(--tone) 20%, var(--glass));
+		border: 1px solid color-mix(in srgb, var(--tone) 38%, var(--line));
+		box-shadow: 0 10px 28px color-mix(in srgb, var(--tone) 20%, transparent);
+	}
+
+	.hero-copy {
+		position: relative;
+		z-index: 1;
+		min-width: 0;
+	}
+
+	.eyebrow {
+		margin: 0 0 0.35rem;
+		font-size: 0.74rem;
+		font-weight: 700;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: color-mix(in srgb, var(--tone) 70%, var(--muted));
+	}
+
+	.hero h1 {
+		margin: 0 0 0.35rem;
+		font-size: clamp(1.85rem, 4vw, 2.45rem);
+		letter-spacing: -0.03em;
+	}
+
+	.desc {
+		margin: 0 0 0.35rem;
+		color: var(--ink-soft);
+		font-size: 0.95rem;
+		line-height: 1.5;
+	}
+
+	.count {
+		margin: 0;
+		font-size: 0.84rem;
+		font-weight: 700;
+		color: var(--muted);
+	}
+
+	.cat-nav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.45rem;
+		margin-bottom: 1.75rem;
+		animation: rise 0.6s ease 0.06s both;
+	}
+
+	.cat-tab {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		padding: 0.42rem 0.78rem;
+		border-radius: 999px;
+		border: 1px solid var(--line);
+		background: color-mix(in srgb, var(--glass) 70%, transparent);
+		font-size: 0.84rem;
+		font-weight: 700;
+		color: var(--muted);
+		text-decoration: none;
+		transition:
+			border-color 0.18s ease,
+			background 0.18s ease,
+			color 0.18s ease,
+			transform 0.18s ease;
+	}
+
+	.cat-tab:hover {
+		border-color: color-mix(in srgb, var(--tone) 40%, var(--line));
+		color: var(--ink);
+		transform: translateY(-1px);
+	}
+
+	.cat-tab.active {
+		border-color: color-mix(in srgb, var(--tone) 50%, var(--line));
+		background: color-mix(in srgb, var(--tone) 16%, var(--glass));
+		color: color-mix(in srgb, var(--tone) 80%, var(--ink));
+	}
+
+	.tab-count {
+		font-size: 0.72rem;
+		font-weight: 700;
+		padding: 0.08rem 0.38rem;
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--tone) 12%, var(--bg-2));
+		color: var(--muted);
+	}
+
+	.cat-tab.active .tab-count {
+		background: color-mix(in srgb, var(--tone) 22%, transparent);
+		color: color-mix(in srgb, var(--tone) 75%, var(--ink));
+	}
+
+	.posts-section {
+		animation: rise-y 0.65s ease 0.1s both;
+	}
+
+	.empty {
+		margin: 0;
+		padding: 2rem 1.25rem;
+		text-align: center;
+		color: var(--muted);
+		border-radius: 0.85rem;
+	}
+
+	.tone-coral {
+		--tone: #f0a48e;
+	}
+	.tone-teal {
+		--tone: #7fc4b5;
+	}
+	.tone-amber {
+		--tone: #e6c07b;
+	}
+
+	@media (max-width: 560px) {
+		.hero {
+			grid-template-columns: 1fr;
+			text-align: center;
+			justify-items: center;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.hero,
+		.cat-nav,
+		.posts-section {
+			animation: none;
+		}
+	}
+</style>

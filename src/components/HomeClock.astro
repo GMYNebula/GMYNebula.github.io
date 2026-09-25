@@ -1,0 +1,108 @@
+---
+import Icon from './Icon.astro';
+---
+
+<article class="card widget clock" aria-label="北京时间">
+	<div class="clock-row" data-home-clock>
+		<span class="clock-label"><Icon name="clock" size={14} /> 北京时间</span>
+		<time class="clock-time" datetime="" data-clock-time>--:--:--</time>
+		<p class="clock-date" data-clock-date>——</p>
+	</div>
+</article>
+
+<script>
+	const WEEKDAYS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+	/** 北京时间 = Asia/Shanghai（UTC+8，无夏令时） */
+	const TZ = 'Asia/Shanghai';
+
+	function tick() {
+		const root = document.querySelector('[data-home-clock]');
+		if (!root) return;
+
+		const now = new Date();
+		const parts = new Intl.DateTimeFormat('en-GB', {
+			timeZone: TZ,
+			hour: '2-digit',
+			minute: '2-digit',
+			second: '2-digit',
+			hourCycle: 'h23',
+			year: 'numeric',
+			month: '2-digit',
+			day: '2-digit',
+		}).formatToParts(now);
+
+		const get = (type) => parts.find((p) => p.type === type)?.value ?? '';
+		const h = get('hour');
+		const m = get('minute');
+		const s = get('second');
+		const y = get('year');
+		const mo = get('month');
+		const d = get('day');
+
+		const localForWeekday = new Date(now.toLocaleString('en-US', { timeZone: TZ }));
+		const weekday = WEEKDAYS[localForWeekday.getDay()] ?? '';
+
+		const timeEl = root.querySelector('[data-clock-time]');
+		const dateEl = root.querySelector('[data-clock-date]');
+		if (timeEl) {
+			timeEl.textContent = `${h}:${m}:${s}`;
+			timeEl.dateTime = `${y}-${mo}-${d}T${h}:${m}:${s}+08:00`;
+		}
+		if (dateEl) {
+			dateEl.textContent = `${Number(mo)}月${Number(d)}日 ${weekday}`;
+		}
+	}
+
+	tick();
+	window.setInterval(tick, 1000);
+	document.addEventListener('astro:page-load', tick);
+</script>
+
+<style>
+	.widget.clock {
+		padding: 0.45rem 0.85rem;
+		width: fit-content;
+		max-width: 100%;
+	}
+
+	.clock-row {
+		display: flex;
+		align-items: baseline;
+		gap: 0.5rem 0.65rem;
+		flex-wrap: wrap;
+	}
+
+	.clock-label {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25rem;
+		font-size: 0.75rem;
+		font-weight: 650;
+		color: var(--muted);
+		white-space: nowrap;
+	}
+
+	.clock-time {
+		font-family: var(--font-display-stack);
+		font-size: 1.15rem;
+		font-weight: 700;
+		letter-spacing: 0.03em;
+		line-height: 1.1;
+		color: var(--ink);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.clock-date {
+		margin: 0;
+		font-size: 0.78rem;
+		font-weight: 600;
+		color: var(--muted);
+		white-space: nowrap;
+	}
+
+	.clock-date::before {
+		content: '·';
+		margin-right: 0.55rem;
+		opacity: 0.5;
+	}
+</style>

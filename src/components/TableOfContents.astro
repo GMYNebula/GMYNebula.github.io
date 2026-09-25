@@ -1,0 +1,172 @@
+---
+import Icon from './Icon.astro';
+import TocTree, { type TocNode } from './TocTree.astro';
+
+interface Heading {
+	depth: number;
+	slug: string;
+	text: string;
+}
+
+interface Props {
+	headings: Heading[];
+}
+
+/** h2–h5：对应 Markdown `#` ~ `####` */
+const TOC_MIN = 2;
+const TOC_MAX = 5;
+/** GFM 脚注区自动插入的 sr-only 标题，不是正文结构 */
+const TOC_SKIP_SLUGS = new Set(['footnote-label']);
+
+const { headings } = Astro.props;
+
+const cleanText = (text: string) =>
+	text
+		.replace(/\s*#$/u, '')
+		.replace(/\u00a0/g, ' ')
+		.trim();
+
+type FlatHeading = Heading & { text: string };
+
+const flat: FlatHeading[] = headings
+	.filter((h) => h.depth >= TOC_MIN && h.depth <= TOC_MAX)
+	.filter((h) => !TOC_SKIP_SLUGS.has(h.slug))
+	.map((h) => ({ ...h, text: cleanText(h.text) }))
+	.filter((h) => h.text.length > 0);
+
+function buildTree(items: FlatHeading[]): TocNode[] {
+	const root: TocNode[] = [];
+	const stack: TocNode[] = [];
+
+	for (const item of items) {
+		const node: TocNode = { heading: item, children: [] };
+		while (stack.length > 0 && stack[stack.length - 1].heading.depth >= item.depth) {
+			stack.pop();
+		}
+		if (stack.length === 0) {
+			root.push(node);
+		} else {
+			stack[stack.length - 1].children.push(node);
+		}
+		stack.push(node);
+	}
+
+	return root;
+}
+
+const tree = buildTree(flat);
+const visible = flat.length >= 2;
+const slugList = flat.map((h) => h.slug);
+---
+
+{
+	visible && (
+		<aside class="toc-rail" data-toc-rail data-toc-slugs={JSON.stringify(slugList)}>
+			<details class="toc-panel toc-mobile">
+				<summary class="toc-label">
+					<Icon name="sparkle" size={14} />
+					<span>本篇目录</span>
+				</summary>
+				<nav class="toc-nav" aria-label="本篇目录">
+					<TocTree tree={tree} />
+				</nav>
+			</details>
+
+			<div class="toc-panel toc-desktop">
+				<p class="toc-label">
+					<Icon name="sparkle" size={14} />
+					<span>本篇目录</span>
+				</p>
+				<nav class="toc-nav" aria-label="本篇目录">
+					<TocTree tree={tree} />
+				</nav>
+			</div>
+		</aside>
+	)
+}
+
+<script>
+	import { initTocSpy } from '../scripts/toc-spy.ts';
+	initTocSpy();
+</script>
+
+<style>
+	.toc-rail {
+		width: 100%;
+	}
+
+	.toc-label {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		margin: 0 0 0.75rem;
+		font-family: var(--font-display-stack);
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--ink);
+	}
+
+	.toc-desktop {
+		display: none;
+	}
+
+	.toc-mobile {
+		margin: 0 0 1.25rem;
+		padding: 0.75rem 0.9rem;
+		border: 1px solid var(--line);
+		border-radius: 0.75rem;
+		background: color-mix(in srgb, var(--glass) 80%, transparent);
+	}
+
+	.toc-mobile > summary {
+		cursor: pointer;
+		list-style: none;
+		user-select: none;
+		margin: 0;
+	}
+
+	.toc-mobile > summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.toc-mobile[open] > summary.toc-label {
+		margin-bottom: 0.65rem;
+		padding-bottom: 0.5rem;
+		border-bottom: 1px dashed var(--line);
+	}
+
+	@media (min-width: 1280px) {
+		.toc-mobile {
+			display: none;
+		}
+
+		.toc-rail {
+			position: fixed;
+			top: 5.25rem;
+			left: calc(
+				50% + min(calc(var(--article-shell) / 2), 50vw - 1.25rem) + var(--toc-gap)
+			);
+			width: var(--toc-width);
+			max-height: calc(100vh - 6rem);
+			overflow-y: auto;
+			scrollbar-width: thin;
+			z-index: 15;
+		}
+
+		.toc-desktop {
+			display: block;
+			padding: 0.85rem 0.75rem;
+			border: 1px solid var(--line);
+			border-radius: 0.75rem;
+			background: color-mix(in srgb, var(--glass) 88%, transparent);
+			backdrop-filter: blur(12px) saturate(1.15);
+			-webkit-backdrop-filter: blur(12px) saturate(1.15);
+		}
+
+		.toc-desktop .toc-label {
+			margin-bottom: 0.85rem;
+			padding-bottom: 0.55rem;
+			border-bottom: 1px dashed var(--line);
+		}
+	}
+</style>

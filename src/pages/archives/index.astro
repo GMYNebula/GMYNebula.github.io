@@ -1,0 +1,168 @@
+---
+import ArchiveTimeline from '../../components/ArchiveTimeline.astro';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import Icon from '../../components/Icon.astro';
+import PostList from '../../components/PostList.astro';
+import { SITE_TITLE } from '../../consts';
+import { getArchives } from '../../utils/archives';
+
+const archives = await getArchives();
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={`归档 · ${SITE_TITLE}`} description="时间线上的爪印" />
+	</head>
+	<body>
+		<Header />
+		<main class="page">
+			<header class="mast">
+				<p class="eyebrow"><Icon name="archive" size={14} /> Archives</p>
+				<h1>归档</h1>
+				{
+					archives.length > 0 && (
+						<div class="view-switch" role="tablist" aria-label="归档视图">
+							<button type="button" class="view-btn active" data-view="card" role="tab" aria-selected="true">
+								<Icon name="blog" size={14} />
+								卡片
+							</button>
+							<button type="button" class="view-btn" data-view="timeline" role="tab" aria-selected="false">
+								<Icon name="archive" size={14} />
+								时间轴
+							</button>
+						</div>
+					)
+				}
+			</header>
+			{
+				archives.length === 0 ? (
+					<p class="empty">还没有文章喵～</p>
+				) : (
+					<>
+						<div class="view-panel" data-panel="card">
+							{archives.map((yearBlock) => {
+								const posts = yearBlock.months.flatMap((month) => month.posts);
+								return (
+									<section class="year-section">
+										<header class="year-head">
+											<h2>{yearBlock.year}</h2>
+											<span>{yearBlock.count} 篇</span>
+										</header>
+										<PostList posts={posts} variant="card" />
+									</section>
+								);
+							})}
+						</div>
+						<div class="view-panel" data-panel="timeline" hidden>
+							<ArchiveTimeline archives={archives} />
+						</div>
+					</>
+				)
+			}
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.narrow,
+	.page {
+		width: min(920px, calc(100% - 2.5rem));
+		margin: 0 auto;
+		padding-top: 2rem;
+		padding-bottom: 4rem;
+	}
+
+	.mast {
+		margin-bottom: 2rem;
+	}
+
+	.eyebrow {
+		margin: 0 0 0.45rem;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		font-size: 0.78rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--accent);
+	}
+
+	.mast h1 {
+		margin: 0 0 1rem;
+	}
+
+	.view-switch {
+		display: inline-flex;
+		gap: 0.35rem;
+		padding: 0.28rem;
+		border: 1px solid var(--line);
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--glass) 88%, transparent);
+	}
+
+	.view-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		padding: 0.38rem 0.78rem;
+		border: none;
+		border-radius: 999px;
+		background: transparent;
+		color: var(--muted);
+		font: inherit;
+		font-size: 0.84rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition:
+			background 0.15s ease,
+			color 0.15s ease;
+	}
+
+	.view-btn.active {
+		background: var(--accent-glow);
+		color: var(--accent-deep);
+	}
+
+	.view-btn:hover:not(.active) {
+		color: var(--ink-soft);
+	}
+
+	.empty {
+		color: var(--muted);
+	}
+
+	.year-section {
+		margin-bottom: 2.25rem;
+		padding-bottom: 0.25rem;
+		border-bottom: 1px solid var(--line);
+	}
+
+	.year-section:last-child {
+		margin-bottom: 0;
+		border-bottom: none;
+	}
+
+	.year-head {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-bottom: 1rem;
+	}
+
+	.year-head h2 {
+		margin: 0;
+		font-size: 1.75rem;
+	}
+
+	.year-head span {
+		color: var(--muted);
+		font-size: 0.9rem;
+		font-weight: 600;
+	}
+</style>

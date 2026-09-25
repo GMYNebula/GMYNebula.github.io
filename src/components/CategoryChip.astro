@@ -1,0 +1,115 @@
+---
+import Icon from './Icon.astro';
+import { getCategoryMeta } from '../data/categories';
+import { categoryToSlug } from '../utils/categories';
+
+interface Props {
+	name: string;
+	size?: 'sm' | 'md';
+	/** pill：独立标签；inline：融进 meta 行 */
+	variant?: 'pill' | 'inline';
+	/** 卡片内嵌时设为 false，避免 a 套 a */
+	link?: boolean;
+}
+
+const { name, size = 'sm', variant = 'pill', link = true } = Astro.props;
+const meta = getCategoryMeta(name);
+const iconSize = size === 'md' ? 14 : variant === 'inline' ? 11 : 12;
+const Tag = link ? 'a' : 'span';
+---
+
+{
+	meta && (
+		<Tag
+			class={`cat-chip tone-${meta.tone} size-${size} variant-${variant}`}
+			{...(link
+				? { href: `/categories/${categoryToSlug(meta.name)}/` }
+				: { 'aria-label': meta.name })}
+		>
+			<Icon name={meta.icon} size={iconSize} />
+			<span>{meta.name}</span>
+		</Tag>
+	)
+}
+
+<style>
+	.cat-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.28rem;
+		font-weight: 700;
+		white-space: nowrap;
+		text-decoration: none;
+		transition:
+			color 0.15s ease,
+			border-color 0.15s ease,
+			background 0.15s ease;
+	}
+
+	/* ===== pill（文章页等） ===== */
+	.variant-pill {
+		padding: 0.18rem 0.52rem;
+		border-radius: 999px;
+		border: 1px solid color-mix(in srgb, var(--tone) 35%, var(--line));
+		background: color-mix(in srgb, var(--tone) 14%, var(--glass));
+		color: color-mix(in srgb, var(--tone) 75%, var(--ink));
+		font-size: 0.72rem;
+	}
+
+	.size-md.variant-pill {
+		padding: 0.28rem 0.65rem;
+		font-size: 0.78rem;
+	}
+
+	a.variant-pill:hover {
+		border-color: color-mix(in srgb, var(--tone) 55%, var(--line));
+		background: color-mix(in srgb, var(--tone) 22%, var(--glass));
+		transform: translateY(-1px);
+	}
+
+	/* ===== inline（列表 / 卡片 meta） ===== */
+	.variant-inline {
+		padding: 0;
+		border: none;
+		background: none;
+		font-size: 0.82rem;
+		color: color-mix(in srgb, var(--tone) 65%, var(--muted));
+		vertical-align: baseline;
+	}
+
+	.size-md.variant-inline {
+		font-size: 0.84rem;
+	}
+
+	a.variant-inline:hover {
+		color: color-mix(in srgb, var(--tone) 85%, var(--ink));
+	}
+
+	.cat-chip :global(svg) {
+		flex-shrink: 0;
+		opacity: 0.8;
+	}
+
+	.variant-inline :global(svg) {
+		opacity: 0.65;
+	}
+
+	.tone-coral {
+		--tone: #f0a48e;
+	}
+	.tone-teal {
+		--tone: #7fc4b5;
+	}
+	.tone-amber {
+		--tone: #e6c07b;
+	}
+	.tone-violet {
+		--tone: #b8a4f0;
+	}
+	.tone-sky {
+		--tone: #8ec5f0;
+	}
+	.tone-rose {
+		--tone: #f0a0b8;
+	}
+</style>

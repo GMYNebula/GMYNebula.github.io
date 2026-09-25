@@ -1,0 +1,83 @@
+---
+interface Props {
+	eyebrow?: string;
+	title: string;
+	desc?: string;
+	href?: string;
+	linkLabel?: string;
+	compact?: boolean;
+}
+
+const { eyebrow, title, desc, href, linkLabel = '查看全部', compact = false } = Astro.props;
+---
+
+<header class:list={['section-head', { compact }]}>
+	{eyebrow && <p class="eyebrow">{eyebrow}</p>}
+	<div class="row">
+		<h2 class="title">{title}</h2>
+		{
+			href && (
+				<a class="more" href={href}>
+					{linkLabel}
+				</a>
+			)
+		}
+	</div>
+	{desc && <p class="desc">{desc}</p>}
+</header>
+
+<style>
+	.section-head {
+		margin-bottom: 1.35rem;
+	}
+
+	.section-head.compact {
+		margin-bottom: 0.9rem;
+	}
+
+	.section-head.compact .title {
+		font-size: 1.15rem;
+	}
+
+	.eyebrow {
+		margin: 0 0 0.35rem;
+		font-size: 0.78rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--accent);
+	}
+
+	.row {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.5rem 1rem;
+	}
+
+	.title {
+		margin: 0;
+		font-size: clamp(1.45rem, 3vw, 1.85rem);
+	}
+
+	.more {
+		font-size: 0.92rem;
+		font-weight: 700;
+		text-decoration: none;
+		color: var(--ink);
+		border-bottom: 1px solid transparent;
+	}
+
+	.more:hover {
+		color: var(--accent);
+		border-bottom-color: var(--accent);
+	}
+
+	.desc {
+		margin: 0.45rem 0 0;
+		color: var(--muted);
+		font-size: 0.98rem;
+		max-width: 40ch;
+	}
+</style>

@@ -1,0 +1,138 @@
+---
+/**
+ * QQ 式头像 + 挂件叠层。
+ * 圆形裁切头像，挂件溢出在上层（猫耳/环不会被裁掉）。
+ * 浮动只作用在 lift 层，地面阴影留在原地并随高度收放。
+ */
+import { profile } from '../data/profile';
+
+interface Props {
+	src?: string;
+	alt: string;
+	/** CSS 尺寸，如 12rem / 10rem */
+	size?: string;
+	/** 挂件图；传空字符串可关闭 */
+	pendant?: string;
+	class?: string;
+	loading?: 'eager' | 'lazy';
+	width?: number;
+	height?: number;
+}
+
+const {
+	src = profile.avatar,
+	alt,
+	size = '12rem',
+	pendant = profile.pendant,
+	class: className = '',
+	loading = 'eager',
+	width = 192,
+	height = 192,
+} = Astro.props;
+
+const showPendant = Boolean(pendant);
+---
+
+<figure
+	class:list={['avatar-pendant', showPendant && 'has-pendant', className]}
+	style={`--avatar-size:${size}`}
+>
+	<span class="avatar-pendant__shadow" aria-hidden="true"></span>
+	<div class="avatar-pendant__lift">
+		<div class="avatar-pendant__face">
+			<img
+				class="profile-avatar-img"
+				src={src}
+				alt={alt}
+				width={width}
+				height={height}
+				loading={loading}
+				decoding="async"
+			/>
+		</div>
+		{
+			showPendant && (
+				<img
+					class="avatar-pendant__frame"
+					src={pendant}
+					alt=""
+					width={width}
+					height={height}
+					aria-hidden="true"
+					draggable="false"
+				/>
+			)
+		}
+	</div>
+</figure>
+
+<style>
+	.avatar-pendant {
+		--avatar-float-y: 0.75rem;
+		position: relative;
+		z-index: 1;
+		width: var(--avatar-size);
+		height: var(--avatar-size);
+		margin: 0 auto 1.35rem;
+		flex-shrink: 0;
+	}
+
+	/* 地面阴影：不跟着 lift 上移，只做收小/变淡 */
+	.avatar-pendant__shadow {
+		position: absolute;
+		left: 50%;
+		bottom: 0.1rem;
+		z-index: 0;
+		width: 58%;
+		height: 0.7rem;
+		border-radius: 999px;
+		background: radial-gradient(
+			ellipse at center,
+			color-mix(in srgb, var(--ink) 30%, transparent) 0%,
+			transparent 72%
+		);
+		transform: translateX(-50%);
+		pointer-events: none;
+		filter: blur(1.5px);
+	}
+
+	.avatar-pendant__lift {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		will-change: transform;
+	}
+
+	.avatar-pendant__face {
+		position: absolute;
+		inset: 11%;
+		z-index: 1;
+		border-radius: 999px;
+		overflow: hidden;
+		border: 2px solid color-mix(in srgb, var(--accent) 42%, var(--line));
+		background: var(--bg-2);
+		box-shadow:
+			0 10px 28px color-mix(in srgb, var(--accent) 20%, transparent),
+			0 0 0 5px color-mix(in srgb, var(--accent-glow) 55%, transparent);
+	}
+
+	.avatar-pendant.has-pendant .avatar-pendant__face {
+		inset: 15.3%;
+		border: none;
+		background: transparent;
+		box-shadow: none;
+	}
+
+	.avatar-pendant__frame {
+		position: absolute;
+		inset: 0;
+		z-index: 2;
+		width: 100%;
+		height: 100%;
+		max-width: none;
+		pointer-events: none;
+		user-select: none;
+		object-fit: contain;
+		filter: drop-shadow(0 10px 16px color-mix(in srgb, var(--ink) 22%, transparent));
+	}
+</style>

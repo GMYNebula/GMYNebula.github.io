@@ -1,0 +1,109 @@
+---
+import { SITE_BACKGROUNDS, SITE_BACKGROUND_INTERVAL_SEC } from '../consts/backgrounds';
+---
+
+<div
+	class="site-bg"
+	id="site-bg"
+	aria-hidden="true"
+	data-interval={SITE_BACKGROUND_INTERVAL_SEC}
+>
+	<div class="site-bg__slides">
+		{
+			SITE_BACKGROUNDS.map((src, i) => (
+				<div class:list={['site-bg__slide', i === 0 && 'is-active']}>
+					<img src={src} alt="" loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
+				</div>
+			))
+		}
+	</div>
+	<div class="site-bg__veil"></div>
+	<div class="site-bg__glow"></div>
+</div>
+
+<script>
+	const root = document.getElementById('site-bg');
+	if (root) {
+		const slides = [...root.querySelectorAll<HTMLElement>('.site-bg__slide')];
+		const intervalSec = Number(root.dataset.interval) || 8;
+		if (slides.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+			let index = 0;
+			window.setInterval(() => {
+				slides[index]?.classList.remove('is-active');
+				index = (index + 1) % slides.length;
+				slides[index]?.classList.add('is-active');
+			}, intervalSec * 1000);
+		}
+	}
+</script>
+
+<style is:global>
+	.site-bg {
+		view-transition-name: site-bg;
+		position: fixed;
+		inset: 0;
+		z-index: -1;
+		overflow: hidden;
+		pointer-events: none;
+	}
+
+	.site-bg__slides {
+		position: absolute;
+		inset: -12%;
+	}
+
+	.site-bg__slide {
+		position: absolute;
+		inset: 0;
+		opacity: 0;
+		transition: opacity 1.8s ease;
+		will-change: opacity;
+	}
+
+	.site-bg__slide.is-active {
+		opacity: 1;
+	}
+
+	.site-bg__slide img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		filter: blur(12px) saturate(1.06) brightness(0.94);
+	}
+
+	html[data-theme='light'] .site-bg__slide img {
+		filter: blur(11px) saturate(1.04) brightness(1.02);
+	}
+
+	.site-bg__veil {
+		position: absolute;
+		inset: 0;
+		background: color-mix(in srgb, var(--bg) 68%, transparent);
+		backdrop-filter: blur(4px) saturate(1.04);
+		-webkit-backdrop-filter: blur(4px) saturate(1.04);
+	}
+
+	html[data-theme='light'] .site-bg__veil {
+		background: color-mix(in srgb, var(--bg) 76%, transparent);
+	}
+
+	.site-bg__glow {
+		position: absolute;
+		inset: 0;
+		background-image:
+			radial-gradient(ellipse 90% 55% at 8% -8%, var(--bg-glow-1), transparent 55%),
+			radial-gradient(ellipse 70% 45% at 92% 8%, var(--bg-glow-2), transparent 52%),
+			radial-gradient(ellipse 60% 50% at 70% 95%, var(--bg-glow-3), transparent 55%);
+		opacity: 0.85;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.site-bg__slide {
+			transition: none;
+		}
+
+		.site-bg__slide:not(:first-child) {
+			display: none;
+		}
+	}
+</style>

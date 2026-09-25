@@ -1,0 +1,231 @@
+---
+import { createHighlighter } from 'shiki';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+
+if (import.meta.env.PROD) {
+	return new Response(null, { status: 404, statusText: 'Not Found' });
+}
+
+const lightCandidates = [
+	{ id: 'ayu-light', note: '当前日间 · Ayu Light' },
+	{ id: 'rose-pine-dawn', note: '奶油暖底' },
+	{ id: 'catppuccin-latte', note: '粉彩柔和' },
+	{ id: 'vitesse-light', note: '暖黄博客风' },
+	{ id: 'snazzy-light', note: '干净 IDE 亮' },
+	{ id: 'github-light-default', note: 'GitHub 标准亮' },
+	{ id: 'one-light', note: 'One Light 简洁' },
+	{ id: 'material-theme-lighter', note: 'Material 浅灰' },
+	{ id: 'everforest-light', note: '森林暖绿浅' },
+	{ id: 'gruvbox-light-soft', note: '复古暖黄' },
+	{ id: 'min-light', note: '极简低对比' },
+	{ id: 'slack-ochin', note: 'Slack 粉紫浅' },
+	{ id: 'kanagawa-lotus', note: '和风浅底' },
+] as const;
+
+const darkCandidates = [
+	{ id: 'ayu-dark', note: '当前夜间 · Ayu Dark' },
+	{ id: 'github-dark-dimmed', note: 'GitHub 暗' },
+	{ id: 'rose-pine-moon', note: '与 rose-pine-dawn 成套' },
+	{ id: 'catppuccin-mocha', note: '与 catppuccin-latte 成套' },
+	{ id: 'vitesse-dark', note: '与 vitesse-light 成套' },
+	{ id: 'one-dark-pro', note: 'One Dark 经典' },
+	{ id: 'night-owl', note: '深蓝 IDE' },
+	{ id: 'vesper', note: '低对比安静' },
+] as const;
+
+const sample = `const nest = {
+  name: '猫窝',
+  accent: '#c44b2f',
+  ready: true,
+};
+
+export function greet(who = 'Niko') {
+  return \`Hello, \${who}!\`;
+}`;
+
+const bashSample = `npm run dev
+npm run build`;
+
+const allThemes = [...lightCandidates, ...darkCandidates].map((t) => t.id);
+
+const highlighter = await createHighlighter({
+	themes: allThemes,
+	langs: ['javascript', 'bash'],
+});
+
+const render = (code: string, lang: 'javascript' | 'bash', theme: string) =>
+	highlighter.codeToHtml(code, { lang, theme });
+
+const lightBlocks = lightCandidates.map(({ id, note }) => ({
+	id,
+	note,
+	html: render(sample, 'javascript', id),
+}));
+
+const darkBlocks = darkCandidates.map(({ id, note }) => ({
+	id,
+	note,
+	html: render(sample, 'javascript', id),
+}));
+---
+
+<html lang="zh-CN">
+	<head>
+		<BaseHead
+			title="代码主题预览（仅开发）"
+			description="本地对比 Shiki 日间 / 夜间代码块主题，无需访问外网。"
+		/>
+	</head>
+	<body>
+		<Header />
+		<main class="dev-themes">
+			<section class="intro glass">
+				<h1>代码主题预览</h1>
+				<p>
+					仅 <code>npm run dev</code> 下可用。这里只看<strong>语法配色</strong>；正式接入请在
+					<code>ec.config.mjs</code> 里改 <code>themes: ['夜间', '日间']</code>，再到
+					<a href="/blog/markdown-playground/">Markdown 小实验场</a> 看 Expressive Code 外框效果。
+				</p>
+				<p class="hint">选定后告诉我编号或主题名，例如「日间 B · catppuccin-latte」。</p>
+			</section>
+
+			<section class="group">
+				<h2>日间候选（sites 切到日间再看背景融合）</h2>
+				<div class="grid">
+					{
+						lightBlocks.map(({ id, note, html }) => (
+							<article class="theme-card glass">
+								<header>
+									<h3>{id}</h3>
+									<p>{note}</p>
+								</header>
+								<div class="shiki-wrap" set:html={html} />
+							</article>
+						))
+					}
+				</div>
+			</section>
+
+			<section class="group">
+				<h2>夜间候选（sites 切到夜间）</h2>
+				<div class="grid">
+					{
+						darkBlocks.map(({ id, note, html }) => (
+							<article class="theme-card glass">
+								<header>
+									<h3>{id}</h3>
+									<p>{note}</p>
+								</header>
+								<div class="shiki-wrap" set:html={html} />
+							</article>
+						))
+					}
+				</div>
+			</section>
+
+			<section class="group">
+				<h2>终端样式参考（bash）</h2>
+				<div class="grid grid-compact">
+					{
+						['ayu-light', 'catppuccin-latte', 'vitesse-light'].map((id) => (
+							<article class="theme-card glass">
+								<header>
+									<h3>{id}</h3>
+								</header>
+								<div class="shiki-wrap" set:html={render(bashSample, 'bash', id)} />
+							</article>
+						))
+					}
+				</div>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.dev-themes {
+		width: min(1100px, calc(100% - 2rem));
+		margin: 0 auto 3rem;
+		padding-top: 1.5rem;
+	}
+
+	.intro {
+		padding: 1.25rem 1.35rem;
+		margin-bottom: 2rem;
+		border-radius: 0.75rem;
+	}
+
+	.intro h1 {
+		margin: 0 0 0.5rem;
+		font-size: 1.45rem;
+	}
+
+	.intro p {
+		margin: 0.35rem 0;
+		color: var(--muted);
+		line-height: 1.65;
+	}
+
+	.intro .hint {
+		color: var(--ink-soft);
+	}
+
+	.group {
+		margin-bottom: 2.5rem;
+	}
+
+	.group h2 {
+		margin: 0 0 1rem;
+		font-size: 1.15rem;
+		color: var(--ink-soft);
+	}
+
+	.grid {
+		display: grid;
+		gap: 1rem;
+		grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+	}
+
+	.grid-compact {
+		grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+	}
+
+	.theme-card {
+		border-radius: 0.65rem;
+		overflow: hidden;
+	}
+
+	.theme-card header {
+		padding: 0.75rem 0.9rem 0.35rem;
+		border-bottom: 1px solid var(--line);
+	}
+
+	.theme-card h3 {
+		margin: 0;
+		font-size: 0.92rem;
+		font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+		color: var(--ink);
+	}
+
+	.theme-card header p {
+		margin: 0.2rem 0 0;
+		font-size: 0.82rem;
+		color: var(--muted);
+	}
+
+	.shiki-wrap :global(pre) {
+		margin: 0;
+		padding: 0.85rem 1rem;
+		overflow-x: auto;
+		font-size: 0.82rem;
+		line-height: 1.55;
+		border-radius: 0;
+	}
+
+	.shiki-wrap :global(code) {
+		font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+	}
+</style>

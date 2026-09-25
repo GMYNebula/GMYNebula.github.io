@@ -1,0 +1,130 @@
+---
+import Icon from './Icon.astro';
+
+interface NavItem {
+	title: string;
+	href: string;
+}
+
+interface Props {
+	prev?: NavItem | null;
+	next?: NavItem | null;
+}
+
+const { prev = null, next = null } = Astro.props;
+---
+
+{
+	(prev || next) && (
+		<nav class="post-nav glass" aria-label="文章导航">
+			{prev ? (
+				<a class="post-nav-link post-nav-link--prev" href={prev.href}>
+					<span class="post-nav-label">
+						<Icon name="arrow" size={14} class="post-nav-arrow post-nav-arrow--prev" />
+						上一篇
+					</span>
+					<span class="post-nav-title">{prev.title}</span>
+				</a>
+			) : (
+				<span class="post-nav-spacer" />
+			)}
+			{next ? (
+				<a class="post-nav-link post-nav-link--next" href={next.href}>
+					<span class="post-nav-label">
+						下一篇
+						<Icon name="arrow" size={14} class="post-nav-arrow" />
+					</span>
+					<span class="post-nav-title">{next.title}</span>
+				</a>
+			) : (
+				<span class="post-nav-spacer" />
+			)}
+		</nav>
+	)
+}
+
+<style>
+	.post-nav {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.65rem;
+		margin-top: 0.35rem;
+		padding: 0.85rem 1rem;
+		border-radius: 0.85rem;
+	}
+
+	.post-nav-link {
+		display: flex;
+		flex-direction: column;
+		gap: 0.28rem;
+		min-width: 0;
+		padding: 0.55rem 0.65rem;
+		border: 1px solid var(--line);
+		border-radius: 0.65rem;
+		background: color-mix(in srgb, var(--glass) 90%, transparent);
+		text-decoration: none;
+		color: inherit;
+		transition:
+			border-color 0.15s ease,
+			background 0.15s ease;
+	}
+
+	.post-nav-link:hover {
+		border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+		background: var(--accent-glow);
+	}
+
+	.post-nav-link--next {
+		text-align: right;
+		align-items: flex-end;
+	}
+
+	.post-nav-label {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		font-size: 0.78rem;
+		font-weight: 600;
+		color: var(--muted);
+	}
+
+	.post-nav-title {
+		font-size: 0.92rem;
+		font-weight: 600;
+		color: var(--ink-soft);
+		line-height: 1.35;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+	}
+
+	.post-nav-link:hover .post-nav-title {
+		color: var(--accent-deep);
+	}
+
+	.post-nav-spacer {
+		display: block;
+	}
+
+	.post-nav :global(.post-nav-arrow) {
+		flex-shrink: 0;
+		opacity: 0.75;
+	}
+
+	.post-nav :global(.post-nav-arrow--prev) {
+		transform: rotate(180deg);
+	}
+
+	@media (max-width: 640px) {
+		.post-nav {
+			grid-template-columns: 1fr;
+		}
+
+		.post-nav-link--next {
+			text-align: left;
+			align-items: flex-start;
+		}
+	}
+</style>

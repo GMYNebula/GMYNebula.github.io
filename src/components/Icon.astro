@@ -1,0 +1,256 @@
+---
+/**
+ * 图标来自 Lucide（ISC）：https://lucide.dev
+ * mark / paw 使用官方 paw-print；moon / sun / cat 亦为官方路径。
+ */
+interface Props {
+	name:
+		| 'home'
+		| 'blog'
+		| 'archive'
+		| 'tag'
+		| 'about'
+		| 'friends'
+		| 'rss'
+		| 'search'
+		| 'github'
+		| 'code'
+		| 'layers'
+		| 'cat'
+		| 'heart'
+		| 'sparkle'
+		| 'moon'
+		| 'sun'
+		| 'paw'
+		| 'arrow'
+		| 'mark'
+		| 'message'
+		| 'calendar'
+		| 'clock'
+		| 'music'
+		| 'file-text'
+		| 'copy'
+		| 'check'
+		| 'mail';
+	size?: number;
+	class?: string;
+}
+
+type Shape =
+	| { type: 'path'; d: string }
+	| { type: 'circle'; cx: number; cy: number; r: number }
+	| { type: 'rect'; x: number; y: number; width: number; height: number; rx?: number; ry?: number };
+
+import { LUCIDE_CHECK, LUCIDE_COPY } from '../lib/icon-shapes';
+
+const icons: Record<Props['name'], { shapes: Shape[]; strokeWidth?: number }> = {
+	home: {
+		shapes: [{ type: 'path', d: 'M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z' }],
+	},
+	blog: {
+		shapes: [
+			{ type: 'path', d: 'M5 4h10a2 2 0 0 1 2 2v14l-4-2-4 2V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12' },
+		],
+	},
+	archive: {
+		shapes: [
+			{
+				type: 'path',
+				d: 'M4 7h16M6 7V5a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v2M6 7v12a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7M9 12h6',
+			},
+		],
+	},
+	tag: { shapes: [{ type: 'path', d: 'M7 7h.01M4 4h7l9 9-7 7-9-9V4z' }] },
+	about: {
+		shapes: [{ type: 'path', d: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 20a8 8 0 0 1 16 0' }],
+	},
+	friends: {
+		shapes: [
+			{
+				type: 'path',
+				d: 'M8 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3.5 19a5.5 5.5 0 0 1 9 0M11.5 19a5.5 5.5 0 0 1 9 0',
+			},
+		],
+	},
+	rss: {
+		shapes: [
+			{
+				type: 'path',
+				d: 'M5 5c8.284 0 15 6.716 15 15M5 11a9 9 0 0 1 9 9M6 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z',
+			},
+		],
+	},
+	search: { shapes: [{ type: 'path', d: 'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3' }] },
+	github: {
+		shapes: [
+			{
+				type: 'path',
+				d: 'M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 19 4.77 5.07 5.07 0 0 0 18.91 1S17.73.65 15 2.48a13.38 13.38 0 0 0-7 0C5.27.65 4.09 1 4.09 1A5.07 5.07 0 0 0 4 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 8 18.13V22',
+			},
+		],
+	},
+	code: { shapes: [{ type: 'path', d: 'M8 8l-4 4 4 4M16 8l4 4-4 4M13 6l-2 12' }] },
+	layers: {
+		shapes: [
+			{
+				type: 'path',
+				d: 'M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z',
+			},
+			{ type: 'path', d: 'M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12' },
+			{ type: 'path', d: 'M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17' },
+		],
+	},
+	/* Lucide cat */
+	cat: {
+		shapes: [
+			{
+				type: 'path',
+				d: 'M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z',
+			},
+			{ type: 'path', d: 'M8 14v.5' },
+			{ type: 'path', d: 'M16 14v.5' },
+			{ type: 'path', d: 'M11.25 16.25h1.5L12 17l-.75-.75Z' },
+		],
+		strokeWidth: 1.75,
+	},
+	heart: {
+		shapes: [
+			{ type: 'path', d: 'M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.6-7 10-7 10z' },
+		],
+	},
+	sparkle: {
+		shapes: [
+			{ type: 'path', d: 'M12 3l1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3z' },
+			{ type: 'path', d: 'M18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8L18 15z' },
+		],
+	},
+	/* Lucide moon */
+	moon: {
+		shapes: [{ type: 'path', d: 'M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z' }],
+		strokeWidth: 1.75,
+	},
+	/* Lucide sun */
+	sun: {
+		shapes: [
+			{ type: 'circle', cx: 12, cy: 12, r: 4 },
+			{ type: 'path', d: 'M12 2v2' },
+			{ type: 'path', d: 'M12 20v2' },
+			{ type: 'path', d: 'm4.93 4.93 1.41 1.41' },
+			{ type: 'path', d: 'm17.66 17.66 1.41 1.41' },
+			{ type: 'path', d: 'M2 12h2' },
+			{ type: 'path', d: 'M20 12h2' },
+			{ type: 'path', d: 'm6.34 17.66-1.41 1.41' },
+			{ type: 'path', d: 'm19.07 4.93-1.41 1.41' },
+		],
+		strokeWidth: 1.75,
+	},
+	/* Lucide paw-print —— 站标 / 猫爪 */
+	paw: {
+		shapes: [
+			{ type: 'circle', cx: 11, cy: 4, r: 2 },
+			{ type: 'circle', cx: 18, cy: 8, r: 2 },
+			{ type: 'circle', cx: 20, cy: 16, r: 2 },
+			{
+				type: 'path',
+				d: 'M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z',
+			},
+		],
+		strokeWidth: 1.75,
+	},
+	mark: {
+		shapes: [
+			{ type: 'circle', cx: 11, cy: 4, r: 2 },
+			{ type: 'circle', cx: 18, cy: 8, r: 2 },
+			{ type: 'circle', cx: 20, cy: 16, r: 2 },
+			{
+				type: 'path',
+				d: 'M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z',
+			},
+		],
+		strokeWidth: 1.75,
+	},
+	arrow: { shapes: [{ type: 'path', d: 'M5 12h14M13 6l6 6-6 6' }] },
+	/* Lucide message-circle */
+	message: {
+		shapes: [
+			{ type: 'path', d: 'M7.9 20A9 9 0 1 0 4 16.1L2 22Z' },
+		],
+	},
+	calendar: {
+		shapes: [
+			{ type: 'path', d: 'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z' },
+		],
+	},
+	clock: {
+		shapes: [
+			{ type: 'circle', cx: 12, cy: 12, r: 10 },
+			{ type: 'path', d: 'M12 6v6l4 2' },
+		],
+	},
+	music: {
+		shapes: [
+			{ type: 'path', d: 'M9 18V5l12-2v13' },
+			{ type: 'circle', cx: 6, cy: 18, r: 3 },
+			{ type: 'circle', cx: 18, cy: 16, r: 3 },
+		],
+	},
+	'file-text': {
+		shapes: [
+			{ type: 'path', d: 'M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z' },
+			{ type: 'path', d: 'M14 2v4a2 2 0 0 0 2 2h4M10 9H8M16 13H8M16 17H8' },
+		],
+	},
+	copy: { shapes: LUCIDE_COPY },
+	check: { shapes: LUCIDE_CHECK },
+	mail: {
+		shapes: [
+			{
+				type: 'path',
+				d: 'm22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7',
+			},
+			{
+				type: 'path',
+				d: 'M2 7v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7l-8.991 5.727a2 2 0 0 1-2.009 0L2 7Z',
+			},
+		],
+	},
+};
+
+const { name, size = 18, class: className } = Astro.props;
+
+const icon = icons[name];
+---
+
+<svg
+	class={className}
+	width={size}
+	height={size}
+	viewBox="0 0 24 24"
+	fill="none"
+	stroke="currentColor"
+	stroke-width={icon.strokeWidth ?? 1.8}
+	stroke-linecap="round"
+	stroke-linejoin="round"
+	aria-hidden="true"
+>
+	{
+		icon.shapes.map((shape) => {
+			if (shape.type === 'circle') {
+				return <circle cx={shape.cx} cy={shape.cy} r={shape.r} />;
+			}
+			if (shape.type === 'rect') {
+				return (
+					<rect
+						x={shape.x}
+						y={shape.y}
+						width={shape.width}
+						height={shape.height}
+						rx={shape.rx ?? 0}
+						ry={shape.ry ?? 0}
+					/>
+				);
+			}
+			return <path d={shape.d} />;
+		})
+	}
+</svg>

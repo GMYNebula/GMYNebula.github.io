@@ -1,0 +1,172 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import Icon from '../../components/Icon.astro';
+import { SITE_TITLE } from '../../consts';
+import { friends } from '../../data/friends';
+import { siteLinkCard } from '../../data/profile';
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={`友链 · ${SITE_TITLE}`} description="朋友们的小站" />
+	</head>
+	<body>
+		<Header />
+		<main class="page narrow">
+			<header class="mast">
+				<p class="eyebrow"><Icon name="friends" size={14} /> Friends</p>
+				<h1>友链</h1>
+				<p class="lede">在文章底部留言申请友链，按下面格式把信息发我就好。</p>
+			</header>
+
+			<section class="apply glass" aria-label="友链申请格式">
+				<h2>本站信息（互换用）</h2>
+				<ul class="format">
+					<li><strong>博客名</strong>：{siteLinkCard.name}</li>
+					<li><strong>简介</strong>：{siteLinkCard.description}</li>
+					<li><strong>链接</strong>：{siteLinkCard.url}</li>
+					<li><strong>头像</strong>：{siteLinkCard.icon}</li>
+				</ul>
+			</section>
+
+			{
+				friends.length > 0 ? (
+					<ul class="friends">
+						{friends.map((friend) => (
+							<li>
+								<a href={friend.url} target="_blank" rel="noopener noreferrer">
+									<span class="name">
+										<Icon name="sparkle" size={15} />
+										{friend.name}
+									</span>
+									<span class="desc">{friend.description}</span>
+									<span class="url">{friend.url}</span>
+								</a>
+							</li>
+						))}
+					</ul>
+				) : (
+					<p class="empty">友链列表还空着，欢迎来换链 ♪</p>
+				)
+			}
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.narrow {
+		width: min(760px, calc(100% - 2.5rem));
+	}
+
+	.mast {
+		margin-bottom: 1.35rem;
+	}
+
+	.eyebrow {
+		margin: 0 0 0.45rem;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		font-size: 0.78rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--accent);
+	}
+
+	.mast h1 {
+		margin: 0;
+	}
+
+	.lede {
+		margin: 0.55rem 0 0;
+		color: var(--muted);
+		line-height: 1.6;
+	}
+
+	.apply {
+		margin-bottom: 1.35rem;
+		padding: 1rem 1.15rem;
+	}
+
+	.apply h2 {
+		margin: 0 0 0.65rem;
+		font-size: 0.95rem;
+		color: var(--ink-soft);
+	}
+
+	.format {
+		margin: 0;
+		padding-left: 1.1rem;
+		color: var(--ink-soft);
+		line-height: 1.75;
+	}
+
+	.format strong {
+		color: var(--ink);
+		font-weight: 600;
+	}
+
+	.empty {
+		margin: 0;
+		padding: 1.25rem 1rem;
+		text-align: center;
+		color: var(--muted);
+		border: 1px dashed var(--line);
+		border-radius: 0.85rem;
+		background: color-mix(in srgb, var(--glass) 70%, transparent);
+	}
+
+	.friends {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 0.75rem;
+	}
+
+	.friends a {
+		display: grid;
+		gap: 0.3rem;
+		padding: 1rem 1.15rem;
+		border: 1px solid var(--line);
+		border-radius: 0.85rem;
+		background: var(--glass);
+		backdrop-filter: blur(10px);
+		text-decoration: none;
+		color: inherit;
+		transition:
+			transform 0.22s ease,
+			background 0.22s ease,
+			border-color 0.22s ease;
+	}
+
+	.friends a:hover {
+		transform: translateY(-3px);
+		border-color: rgba(232, 131, 107, 0.4);
+		background: var(--glass-strong);
+	}
+
+	.name {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-family: var(--font-display-stack);
+		font-size: 1.2rem;
+		font-weight: 700;
+	}
+
+	.desc {
+		color: var(--ink-soft);
+	}
+
+	.url {
+		font-size: 0.85rem;
+		color: var(--muted);
+		word-break: break-all;
+	}
+</style>

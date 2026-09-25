@@ -1,17 +1,21 @@
 ---
+import { formatDateTime, toDatetimeAttr } from '../utils/datetime';
+
 interface Props {
 	date: Date;
+	/** date：长日期；datetime：有具体时间则带时分，否则仅日期 */
+	mode?: 'date' | 'datetime';
 }
 
-const { date } = Astro.props;
+const { date, mode = 'date' } = Astro.props;
+const display =
+	mode === 'datetime'
+		? formatDateTime(date)
+		: date.toLocaleDateString('zh-CN', {
+				year: 'numeric',
+				month: 'long',
+				day: 'numeric',
+			});
 ---
 
-<time datetime={date.toISOString()}>
-	{
-		date.toLocaleDateString('en-us', {
-			year: 'numeric',
-			month: 'short',
-			day: 'numeric',
-		})
-	}
-</time>
+<time datetime={toDatetimeAttr(date)}>{display}</time>

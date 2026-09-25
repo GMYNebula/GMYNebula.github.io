@@ -1,0 +1,75 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import Icon from '../components/Icon.astro';
+import { SITE_TITLE } from '../consts';
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={`迷路了 · ${SITE_TITLE}`} description="404" />
+	</head>
+	<body>
+		<Header />
+		<main class="page narrow">
+			<p class="code">404</p>
+			<h1>喵？这里什么都没有</h1>
+			<p class="hint">也许链接写错了，或者页面搬家了 (；′⌒`)</p>
+			<p class="actions">
+				<a href="/"><Icon name="home" size={15} />回小窝</a>
+				<a href="/archives"><Icon name="archive" size={15} />去归档</a>
+			</p>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.narrow {
+		width: min(760px, calc(100% - 2.5rem));
+		padding-top: 4rem;
+		padding-bottom: 5rem;
+	}
+
+	.code {
+		margin: 0 0 0.5rem;
+		font-family: var(--font-display-stack);
+		font-size: 3.5rem;
+		font-weight: 700;
+		letter-spacing: -0.04em;
+		color: var(--accent);
+		line-height: 1;
+	}
+
+	h1 {
+		margin-bottom: 0.6rem;
+	}
+
+	.hint {
+		margin: 0 0 1.5rem;
+		color: var(--muted);
+	}
+
+	.actions {
+		display: flex;
+		gap: 1rem;
+		margin: 0;
+	}
+
+	.actions a {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		font-weight: 700;
+		text-decoration: none;
+		color: var(--ink);
+		border-bottom: 2px solid var(--accent);
+		padding-bottom: 0.1rem;
+	}
+
+	.actions a:hover {
+		color: var(--accent);
+	}
+</style>

@@ -1,0 +1,300 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import Icon from '../../components/Icon.astro';
+import { SITE_TITLE } from '../../consts';
+import { getAllTags } from '../../utils/tags';
+
+const allTags = await getAllTags();
+const tags = allTags
+	.map((t) => ({
+		...t,
+		posts: t.posts.filter((p) => !p.data.draft),
+		count: t.posts.filter((p) => !p.data.draft).length,
+	}))
+	.filter((t) => t.count > 0);
+
+const max = Math.max(...tags.map((t) => t.count), 1);
+const tones = ['coral', 'teal', 'violet', 'amber', 'sky', 'rose'];
+
+function hash(s: string) {
+	let h = 2166136261;
+	for (let i = 0; i < s.length; i++) {
+		h ^= s.charCodeAt(i);
+		h = Math.imul(h, 16777619);
+	}
+	return h >>> 0;
+}
+
+function fontSize(count: number) {
+	const t = (count - 1) / Math.max(max - 1, 1);
+	return 1.1 + t * 1.5;
+}
+
+const tagItems = tags.map((tag, i) => {
+	const h = hash(tag.name);
+	return {
+		name: tag.name,
+		slug: tag.slug,
+		count: tag.count,
+		tone: tones[h % tones.length],
+		size: fontSize(tag.count),
+		rot: ((h >> 17) % 15) - 7,
+		i,
+	};
+});
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={`标签 · ${SITE_TITLE}`} description="话题词云" />
+	</head>
+	<body>
+		<Header />
+		<main class="page tags-page">
+			<header class="mast">
+				<p class="eyebrow"><Icon name="tag" size={14} /> Tags</p>
+				<h1>标签</h1>
+			</header>
+
+			{
+				tagItems.length === 0 ? (
+					<p class="empty">还没有标签喵～</p>
+				) : (
+					<div class="wordcloud" data-gravity aria-label="标签">
+						{tagItems.map((tag) => (
+							<a
+								class={`word tone-${tag.tone}`}
+								href={`/tags/${tag.slug}/`}
+								draggable="false"
+								style={`--s:${tag.size.toFixed(2)}rem; --r:${tag.rot}deg; --i:${tag.i};`}
+								title={`${tag.name} · ${tag.count}`}
+							>
+								{tag.name}
+								<sup>{tag.count}</sup>
+							</a>
+						))}
+					</div>
+				)
+			}
+		</main>
+		<Footer />
+		<script>
+			import '../../scripts/tag-gravity.ts';
+		</script>
+	</body>
+</html>
+
+<style>
+	.tags-page {
+		width: min(920px, calc(100% - 2.5rem));
+		padding-top: 3rem;
+		padding-bottom: 4.5rem;
+	}
+
+	.mast {
+		margin-bottom: 1.5rem;
+		text-align: center;
+		animation: rise 0.55s ease both;
+	}
+
+	.eyebrow {
+		margin: 0 0 0.45rem;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.35rem;
+		font-size: 0.78rem;
+		font-weight: 700;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: var(--accent);
+	}
+
+	.mast h1 {
+		margin: 0;
+		font-size: clamp(2.4rem, 6vw, 3.4rem);
+	}
+
+	.empty {
+		color: var(--muted);
+		text-align: center;
+	}
+
+	.wordcloud {
+		--gravity-pad: 14px;
+		position: relative;
+		width: 100%;
+		height: clamp(22rem, 52vw, 28rem);
+		margin: 0 auto;
+		border-radius: 1.4rem;
+		background:
+			radial-gradient(ellipse 50% 40% at 20% 30%, rgba(232, 131, 107, 0.08), transparent 60%),
+			radial-gradient(ellipse 45% 40% at 80% 70%, rgba(127, 196, 181, 0.07), transparent 55%),
+			rgba(255, 255, 255, 0.02);
+		border: 1px solid var(--line);
+		overflow: hidden;
+	}
+
+	.wordcloud[data-gravity]::before {
+		content: '';
+		position: absolute;
+		inset: var(--gravity-pad);
+		border: 1px dashed color-mix(in srgb, var(--line-strong) 55%, var(--accent) 45%);
+		border-radius: 1rem;
+		pointer-events: none;
+		opacity: 0.45;
+		z-index: 0;
+	}
+
+	.wordcloud[data-gravity]:not([data-gravity-ready]) {
+		display: flex;
+		flex-wrap: wrap;
+		align-content: flex-start;
+		gap: 0.55rem;
+		padding: calc(var(--gravity-pad) + 0.25rem);
+		overflow: visible;
+	}
+
+	.wordcloud[data-gravity]:not([data-gravity-ready])::before {
+		display: none;
+	}
+
+	.wordcloud[data-gravity]:not([data-gravity-ready]) .word {
+		position: static;
+		rotate: var(--r, 0deg);
+		animation: none;
+	}
+
+	.wordcloud[data-gravity][data-gravity-ready] {
+		overflow: hidden;
+		cursor: grab;
+		touch-action: none;
+		user-select: none;
+	}
+
+	.wordcloud[data-gravity][data-gravity-ready]:active {
+		cursor: grabbing;
+	}
+
+	.wordcloud[data-gravity][data-gravity-ready] .word {
+		position: absolute;
+		will-change: left, top, transform;
+		z-index: 1;
+		-webkit-user-drag: none;
+		user-drag: none;
+	}
+
+	.word {
+		--tone: var(--accent);
+		position: relative;
+		font-family: var(--font-display-stack);
+		font-size: var(--s);
+		font-weight: 700;
+		letter-spacing: -0.02em;
+		line-height: 1.1;
+		text-decoration: none;
+		color: color-mix(in srgb, var(--tone) 82%, var(--ink));
+		white-space: nowrap;
+		padding: 0.38em 0.72em;
+		border-radius: 999px;
+		border: 1px solid color-mix(in srgb, var(--tone) 38%, var(--line));
+		background: color-mix(in srgb, var(--tone) 16%, var(--glass));
+		backdrop-filter: blur(10px) saturate(1.15);
+		-webkit-backdrop-filter: blur(10px) saturate(1.15);
+		box-shadow:
+			0 4px 16px color-mix(in srgb, var(--tone) 14%, transparent),
+			inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent);
+		animation: fade-in 0.5s ease both;
+		animation-delay: calc(var(--i) * 40ms);
+		transition:
+			color 0.2s ease,
+			background 0.2s ease,
+			border-color 0.2s ease,
+			box-shadow 0.25s ease;
+	}
+
+	.wordcloud[data-gravity] .word {
+		transition:
+			color 0.2s ease,
+			background 0.2s ease,
+			border-color 0.2s ease,
+			box-shadow 0.25s ease,
+			scale 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.word:hover,
+	.word:focus-visible {
+		color: #fff;
+		background: color-mix(in srgb, var(--tone) 72%, transparent);
+		border-color: color-mix(in srgb, var(--tone) 55%, transparent);
+		scale: 1.08;
+		box-shadow:
+			0 8px 24px color-mix(in srgb, var(--tone) 32%, transparent),
+			inset 0 1px 0 color-mix(in srgb, #fff 18%, transparent);
+		z-index: 3;
+	}
+
+	.word:focus-visible {
+		outline: none;
+	}
+
+	sup {
+		margin-left: 0.18em;
+		font-size: 0.45em;
+		font-weight: 700;
+		vertical-align: super;
+		opacity: 0.7;
+		font-family: var(--font-body-stack);
+	}
+
+	.tone-coral {
+		--tone: #f0a48e;
+	}
+	.tone-teal {
+		--tone: #7fc4b5;
+	}
+	.tone-violet {
+		--tone: #b8a4f0;
+	}
+	.tone-amber {
+		--tone: #e6c07b;
+	}
+	.tone-sky {
+		--tone: #8ec5f0;
+	}
+	.tone-rose {
+		--tone: #f0a0b8;
+	}
+
+	@media (max-width: 640px) {
+		.wordcloud {
+			height: 22rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.wordcloud {
+			display: flex;
+			flex-wrap: wrap;
+			align-content: flex-start;
+			gap: 0.55rem;
+			height: auto;
+			min-height: 12rem;
+			padding: 1.25rem;
+		}
+
+		.word {
+			position: static;
+			rotate: var(--r, 0deg);
+			animation: none;
+		}
+
+		.word:hover,
+		.word:focus-visible {
+			scale: 1;
+		}
+	}
+</style>

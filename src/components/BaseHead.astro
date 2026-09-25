@@ -1,9 +1,10 @@
 ---
-// Import the global.css file here so that it is included on
-// all pages through the use of the <BaseHead /> component.
 import '../styles/global.css';
+import 'katex/dist/katex.min.css';
+import { ClientRouter } from 'astro:transitions';
 import type { ImageMetadata } from 'astro';
-import FallbackImage from '../assets/blog-placeholder-1.jpg';
+import FallbackImage from '../assets/covers/cover-06.webp';
+import { profile } from '../data/profile';
 import { SITE_TITLE } from '../consts';
 import { Font } from 'astro:assets';
 
@@ -18,11 +19,52 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const { title, description, image = FallbackImage } = Astro.props;
 ---
 
-<!-- Global Metadata -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<link rel="icon" href="/favicon.ico" />
+<ClientRouter />
+<script>
+	import '../scripts/motion.ts';
+	import '../scripts/archive-view.ts';
+	import '../scripts/paw-particles.ts';
+	import { initLightbox } from '../scripts/lightbox.ts';
+	initLightbox();
+</script>
+<script is:inline>
+	(() => {
+		const key = 'theme';
+
+		const readTheme = () => {
+			let theme = 'dark';
+			try {
+				const saved = localStorage.getItem(key);
+				if (saved === 'light' || saved === 'dark') theme = saved;
+				else if (window.matchMedia('(prefers-color-scheme: light)').matches) theme = 'light';
+			} catch {}
+			return theme;
+		};
+
+		const applyTheme = (theme) => {
+			document.documentElement.setAttribute('data-theme', theme);
+		};
+
+		applyTheme(readTheme());
+
+		if (window.__nicocatThemeBound) return;
+		window.__nicocatThemeBound = true;
+
+		document.addEventListener('astro:before-swap', (ev) => {
+			const theme =
+				document.documentElement.getAttribute('data-theme') || readTheme();
+			ev.newDocument.documentElement.setAttribute('data-theme', theme);
+		});
+
+		document.addEventListener('astro:page-load', () => {
+			applyTheme(readTheme());
+		});
+	})();
+</script>
+<link rel="icon" type="image/png" href={profile.icon} />
+<link rel="apple-touch-icon" href={profile.icon} />
 <link rel="sitemap" href="/sitemap-index.xml" />
 <link
 	rel="alternate"
@@ -32,21 +74,81 @@ const { title, description, image = FallbackImage } = Astro.props;
 />
 <meta name="generator" content={Astro.generator} />
 
-<Font cssVariable="--font-atkinson" preload />
+<Font cssVariable="--font-display" preload />
+<Font cssVariable="--font-body" preload />
 
-<!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
 
-<!-- Primary Meta Tags -->
 <title>{title}</title>
 <meta name="description" content={description} />
 
-<!-- Open Graph / Facebook -->
 <meta property="og:type" content="website" />
 <meta property="og:url" content={Astro.url} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={new URL(image.src, Astro.url)} />
 
-<!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={new URL(image.src, Astro.url)} />
+
+{import.meta.env.PROD && (
+	<>
+		<link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+		<script is:inline src="/pagefind/pagefind-ui.js"></script>
+		<script is:inline>
+			window.addEventListener('DOMContentLoaded', () => {
+				const openBtn = document.querySelector('[data-pagefind-open]');
+				if (!openBtn || window.__nicocatPagefindBound) return;
+				window.__nicocatPagefindBound = true;
+
+				const host = document.createElement('div');
+				host.id = 'pagefind-host';
+				host.hidden = true;
+				host.innerHTML =
+					'<div class="pagefind-panel"><button type="button" class="pagefind-close" aria-label="关闭搜索">关闭</button><div id="pagefind-ui"></div></div>';
+				document.body.appendChild(host);
+
+				const style = document.createElement('style');
+				style.textContent =
+					'#pagefind-host{position:fixed;inset:0;z-index:80;background:rgba(18,20,23,.45);display:grid;place-items:start center;padding:12vh 1rem 2rem;backdrop-filter:blur(4px)}' +
+					'#pagefind-host[hidden]{display:none!important}' +
+					'.pagefind-panel{width:min(640px,100%);background:var(--glass-strong,#fff);border:1px solid var(--line,rgba(0,0,0,.1));border-radius:1rem;padding:1rem 1rem 1.25rem;box-shadow:0 20px 50px rgba(0,0,0,.18);position:relative}' +
+					'.pagefind-close{position:absolute;top:.75rem;right:.85rem;border:0;background:transparent;font:inherit;font-weight:700;cursor:pointer;color:#7a828c}' +
+					'.pagefind-close:hover{color:#c44b2f}';
+				document.head.appendChild(style);
+
+				new PagefindUI({ element: '#pagefind-ui', showImages: false, translations: { placeholder: '搜索文章…' } });
+
+				const close = () => {
+					host.hidden = true;
+				};
+				openBtn.addEventListener('click', () => {
+					host.hidden = false;
+					const input = host.querySelector('input');
+					if (input) input.focus();
+				});
+				host.querySelector('.pagefind-close')?.addEventListener('click', close);
+				host.addEventListener('click', (e) => {
+					if (e.target === host) close();
+				});
+				document.addEventListener('keydown', (e) => {
+					if (e.key === 'Escape') close();
+				});
+			});
+		</script>
+	</>
+)}
+
+{
+	!import.meta.env.PROD && (
+		<script is:inline>
+			window.addEventListener('DOMContentLoaded', () => {
+				document.querySelector('[data-pagefind-open]')?.addEventListener('click', () => {
+					alert('站内搜索在构建后可用：npm run build && npm run preview');
+				});
+			});
+		</script>
+	)
+}
