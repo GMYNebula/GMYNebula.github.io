@@ -1,5 +1,7 @@
 @import './motion.css';
-@import 'lxgw-wenkai-mono-gb-screen-webfont/fonts/style.css';
+@import '@fontsource/roboto-mono/400.css';
+/* 92 个 unicode-range 分片，按需加载；latin 分片覆盖 ASCII，其余覆盖中文 */
+@import '@fontsource/zcool-xiaowei/index.css';
 
 :root,
 html[data-theme='dark'] {
@@ -31,9 +33,9 @@ html[data-theme='dark'] {
 	--alert-important: #bc8cff;
 	--alert-warning: #d29922;
 	--alert-caution: #f85149;
-	--font-display-stack: var(--font-display-cjk), var(--font-display), KaiTi, STKaiti, 'Songti SC', Georgia, serif;
+	--font-display-stack: 'ZCOOL XiaoWei', var(--font-display), KaiTi, STKaiti, 'Songti SC', Georgia, serif;
 	--font-body-stack: var(--font-body), 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
-	--font-mono-stack: 'LXGW WenKai Mono GB Screen', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	--font-mono-stack: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 	--article-shell: 860px;
 	--toc-width: 220px;
 	--toc-gap: 1.75rem;
@@ -48,7 +50,7 @@ html[data-theme='light'] {
 	--bg-2: #e8ecf0;
 	--ink: #171a1e;
 	--ink-soft: #3e4650;
-	--muted: #7a828c;
+	--muted: #666e78;
 	--line: rgba(18, 20, 23, 0.1);
 	--line-strong: rgba(18, 20, 23, 0.16);
 	--glass: rgba(255, 255, 255, 0.72);

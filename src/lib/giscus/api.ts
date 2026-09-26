@@ -1,5 +1,6 @@
 import type { GiscusComment, GiscusDiscussionResponse, GiscusReply } from './types';
 import { getGithubApiBase, getGiscusApiBase, githubGraphqlUrl } from './config';
+import { fetchDiscussionFromGithub } from './github-read';
 import { emptyReactionGroups } from './reactions';
 import type { ReactionKey } from './reactions';
 
@@ -93,24 +94,10 @@ export async function fetchDiscussion(
 	query: { repo: string; term: string; category: string; last?: number; after?: string },
 	token?: string,
 ): Promise<GiscusDiscussionResponse> {
-	const params = new URLSearchParams({
-		repo: query.repo,
-		term: query.term,
-		category: query.category,
-		last: String(query.last ?? 50),
-	});
-	if (query.after) params.set('after', query.after);
-
-	const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
-	const res = await fetch(`${getGiscusApiBase()}/discussions?${params}`, { headers });
-	const data = (await res.json()) as GiscusDiscussionResponse & { error?: string };
-
-	if (!res.ok) {
-		const err = new Error(data.error || res.statusText) as Error & { status?: number };
-		err.status = res.status;
-		throw err;
-	}
-	return data;
+	return fetchDiscussionFromGithub(
+		{ repo: query.repo, term: query.term, category: query.category },
+		token,
+	);
 }
 
 export async function createDiscussion(

@@ -1,0 +1,150 @@
+---
+import Icon from './Icon.astro';
+import type { CategoryInfo } from '../utils/categories';
+
+interface Props {
+	items: CategoryInfo[];
+	openName?: string;
+}
+
+const { items, openName } = Astro.props;
+---
+
+<ul class="folders">
+	{
+		items.map((cat) => (
+			<li>
+				<details open={openName === cat.name || undefined}>
+					<summary>
+						<span class="chevron" aria-hidden="true" />
+						<span class="folder" aria-hidden="true" />
+						<span class="folder-name">{cat.name}</span>
+						<span class="folder-count">{cat.count}</span>
+					</summary>
+					{cat.posts.length > 0 ? (
+						<ul class="files">
+							{cat.posts.map((post) => (
+								<li>
+									<a href={`/blog/${post.id}/`}>
+										<Icon name="file-text" size={15} />
+										<span>{post.data.title}</span>
+									</a>
+								</li>
+							))}
+						</ul>
+					) : (
+						<p class="files-empty">还没有文章</p>
+					)}
+				</details>
+			</li>
+		))
+	}
+</ul>
+
+<style>
+	.folders {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		border: 1px solid var(--line);
+		border-radius: 0.85rem;
+		background: color-mix(in srgb, var(--glass) 82%, transparent);
+		backdrop-filter: blur(14px);
+		-webkit-backdrop-filter: blur(14px);
+		overflow: hidden;
+	}
+
+	.folders > li + li {
+		border-top: 1px solid var(--line);
+	}
+
+	summary {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		padding: 0.8rem 1rem;
+		cursor: pointer;
+		list-style: none;
+		color: var(--ink);
+	}
+
+	summary::-webkit-details-marker {
+		display: none;
+	}
+
+	summary:hover {
+		background: color-mix(in srgb, var(--glass) 70%, transparent);
+	}
+
+	.chevron {
+		width: 0.38rem;
+		height: 0.38rem;
+		margin-left: 0.15rem;
+		border-right: 1.5px solid var(--muted);
+		border-bottom: 1.5px solid var(--muted);
+		transform: rotate(-45deg);
+		transition: transform 0.15s ease;
+	}
+
+	details[open] .chevron {
+		transform: rotate(45deg);
+	}
+
+	.folder {
+		position: relative;
+		width: 1.15rem;
+		height: 0.82rem;
+		margin-top: 0.2rem;
+		border: 1.5px solid var(--ink-soft);
+		border-radius: 0.12rem 0.18rem 0.12rem 0.12rem;
+	}
+
+	.folder::before {
+		content: '';
+		position: absolute;
+		top: -0.28rem;
+		left: -1.5px;
+		width: 0.48rem;
+		height: 0.28rem;
+		border: 1.5px solid var(--ink-soft);
+		border-bottom: 0;
+		border-radius: 0.12rem 0.12rem 0 0;
+	}
+
+	.folder-name {
+		font-weight: 700;
+	}
+
+	.folder-count {
+		margin-left: auto;
+		font-size: 0.82rem;
+		font-weight: 700;
+		color: var(--muted);
+	}
+
+	.files {
+		list-style: none;
+		margin: 0;
+		padding: 0 0.75rem 0.55rem 2.55rem;
+	}
+
+	.files a {
+		display: flex;
+		align-items: center;
+		gap: 0.45rem;
+		padding: 0.32rem 0.35rem;
+		color: var(--ink-soft);
+		text-decoration: none;
+	}
+
+	.files a:hover {
+		color: var(--accent-deep);
+	}
+
+	.files-empty {
+		margin: 0;
+		padding: 0 1rem 0.75rem 2.55rem;
+		font-size: 0.88rem;
+		color: var(--muted);
+	}
+</style>

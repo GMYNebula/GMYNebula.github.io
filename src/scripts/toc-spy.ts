@@ -64,7 +64,8 @@ function bootTocSpy(): void {
 			link.classList.toggle('is-active', link.getAttribute('data-toc-link') === slug);
 		}
 
-		if (!window.matchMedia('(min-width: 1280px)').matches) return;
+		// 侧边目录只在 fixed 布局（≥1360px）时才需要滚动跟随
+		if (!window.matchMedia('(min-width: 1360px)').matches) return;
 
 		const panel = getVisibleTocPanel(rail);
 		if (!panel) return;

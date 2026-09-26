@@ -7,7 +7,7 @@ function formatDateKey(date: Date): string {
 	return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
-/** 博客发文 → git-heatmap 的 HeatmapData（52 周网格） */
+/** 博客发文 → git-heatmap 的 HeatmapData（铺满卡片宽度的 52 周网格） */
 const BLOG_LEVELS = [
 	{ threshold: 0, color: 'var(--ghm-color-l0)', label: '无发文' },
 	{ threshold: 1, color: 'var(--ghm-color-l1)', label: '1 篇' },

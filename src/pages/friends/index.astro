@@ -1,11 +1,24 @@
 ---
 import BaseHead from '../../components/BaseHead.astro';
+import Comments from '../../components/Comments.astro';
 import Footer from '../../components/Footer.astro';
 import Header from '../../components/Header.astro';
 import Icon from '../../components/Icon.astro';
 import { SITE_TITLE } from '../../consts';
 import { friends } from '../../data/friends';
 import { siteLinkCard } from '../../data/profile';
+
+const applyTemplate = `- 网址: 
+- 标题: 
+- 描述: 
+- 头像链接: 
+- RSS地址: `;
+
+const siteTemplate = `- 网址: ${siteLinkCard.url}
+- 标题: ${siteLinkCard.name}
+- 描述: ${siteLinkCard.description}
+- 头像链接: ${siteLinkCard.icon}
+- RSS地址: ${siteLinkCard.url}/rss.xml`;
 ---
 
 <!doctype html>
@@ -19,17 +32,17 @@ import { siteLinkCard } from '../../data/profile';
 			<header class="mast">
 				<p class="eyebrow"><Icon name="friends" size={14} /> Friends</p>
 				<h1>友链</h1>
-				<p class="lede">在文章底部留言申请友链，按下面格式把信息发我就好。</p>
+				<p class="lede">在本页底部留言申请友链，按下面代码块的五项发我就好。</p>
 			</header>
 
 			<section class="apply glass" aria-label="友链申请格式">
+				<h2>申请时请发</h2>
+				<pre><code>{applyTemplate}</code></pre>
+			</section>
+
+			<section class="apply glass" aria-label="本站信息">
 				<h2>本站信息（互换用）</h2>
-				<ul class="format">
-					<li><strong>博客名</strong>：{siteLinkCard.name}</li>
-					<li><strong>简介</strong>：{siteLinkCard.description}</li>
-					<li><strong>链接</strong>：{siteLinkCard.url}</li>
-					<li><strong>头像</strong>：{siteLinkCard.icon}</li>
-				</ul>
+				<pre><code>{siteTemplate}</code></pre>
 			</section>
 
 			{
@@ -39,7 +52,7 @@ import { siteLinkCard } from '../../data/profile';
 							<li>
 								<a href={friend.url} target="_blank" rel="noopener noreferrer">
 									<span class="name">
-										<Icon name="sparkle" size={15} />
+										<img class="avatar" src={friend.avatar} alt="" width="28" height="28" />
 										{friend.name}
 									</span>
 									<span class="desc">{friend.description}</span>
@@ -52,6 +65,10 @@ import { siteLinkCard } from '../../data/profile';
 					<p class="empty">友链列表还空着，欢迎来换链 ♪</p>
 				)
 			}
+
+			<section class="comments-zone" aria-label="友链留言">
+				<Comments />
+			</section>
 		</main>
 		<Footer />
 	</body>
@@ -99,16 +116,12 @@ import { siteLinkCard } from '../../data/profile';
 		color: var(--ink-soft);
 	}
 
-	.format {
+	.apply pre {
 		margin: 0;
-		padding-left: 1.1rem;
-		color: var(--ink-soft);
-		line-height: 1.75;
 	}
 
-	.format strong {
-		color: var(--ink);
-		font-weight: 600;
+	.comments-zone {
+		margin-top: 1.35rem;
 	}
 
 	.empty {
@@ -158,6 +171,13 @@ import { siteLinkCard } from '../../data/profile';
 		font-family: var(--font-display-stack);
 		font-size: 1.2rem;
 		font-weight: 700;
+	}
+
+	.avatar {
+		width: 1.75rem;
+		height: 1.75rem;
+		border-radius: 999px;
+		object-fit: cover;
 	}
 
 	.desc {

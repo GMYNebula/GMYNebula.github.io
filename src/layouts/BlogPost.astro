@@ -187,7 +187,8 @@ const displayTags = categoryMeta ? topicTags(tags, categoryMeta.name) : tags;
 		min-width: 0;
 	}
 
-	@media (max-width: 1279px) {
+	/* 与 TableOfContents 的侧栏断点保持一致：≥1360px 才是右侧固定目录 */
+	@media (max-width: 1359px) {
 		.toc-col {
 			order: -1;
 		}

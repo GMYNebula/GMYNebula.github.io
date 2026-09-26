@@ -735,6 +735,9 @@ export function initComments(root: HTMLElement): void {
 			} else if (error.status === 429) {
 				showStatus('请求过于频繁，请稍后再试或登录 GitHub');
 				setCount(null);
+			} else if (error.name === 'TypeError' || error.message === 'Failed to fetch') {
+				showStatus('评论暂时连不上，请稍后再试');
+				setCount(null);
 			} else {
 				showStatus(error.message || '加载评论失败');
 				setCount(null);
@@ -767,4 +770,13 @@ export function initComments(root: HTMLElement): void {
 	bootstrap();
 }
 
-document.querySelectorAll<HTMLElement>('[data-comments-root]').forEach(initComments);
+function mountComments(): void {
+	document.querySelectorAll<HTMLElement>('[data-comments-root]').forEach((root) => {
+		if (root.dataset.commentsMounted) return;
+		root.dataset.commentsMounted = '1';
+		initComments(root);
+	});
+}
+
+mountComments();
+document.addEventListener('astro:page-load', mountComments);

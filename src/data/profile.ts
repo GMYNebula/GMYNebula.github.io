@@ -20,7 +20,7 @@ export const profile = {
 /** 友链页展示的本站信息（部署后把 url 改成正式域名） */
 export const siteLinkCard = {
 	name: '星云可可の小窝',
-	description: '爱猫娘，也爱编程',
+	description: '学习分享代码知识，记录日常。',
 	url: 'https://nebulacoco.top',
-	icon: '/img/icon.png',
+	icon: 'https://nebulacoco.top/img/icon.png',
 } as const;

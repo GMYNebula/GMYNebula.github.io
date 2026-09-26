@@ -26,6 +26,8 @@ const all = await getPublishedPosts();
 const posts = all.filter((p) => !p.data.draft);
 const featured = posts.find((p) => p.data.heroImage) ?? posts[0];
 const recent = posts.filter((p) => p.id !== featured?.id).slice(0, 4);
+const slides = posts.filter((p) => p.data.heroImage).slice(0, 4);
+const FEATURE_INTERVAL_SEC = 7;
 const postCount = posts.length;
 const tags = (await getAllTags()).slice(0, 8);
 const categories = await getAllCategories();
@@ -50,13 +52,8 @@ const heatmapData = buildBlogHeatmapData(posts);
 					<AvatarPendant alt={`${SITE_AUTHOR} 头像`} size="11rem" width={176} height={176} />
 					<div class="identity-main">
 						<h1 class="brand">{SITE_TITLE}</h1>
-						<p class="who">
-							{SITE_AUTHOR}
-							<span class="sep">·</span>
-							{SITE_AUTHOR_EN}
-						</p>
-						<a class="email" href={`mailto:${profile.email}`}>{profile.email}</a>
-						<p class="bio">{SITE_DESCRIPTION}</p>
+						<p class="who">{SITE_AUTHOR_EN}</p>
+						<p class="bio">学习分享代码知识，记录日常。</p>
 						<nav class="social-row" aria-label="社交链接">
 							<a href={profile.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
 								<BrandIcon name="github" size={20} />
@@ -68,6 +65,7 @@ const heatmapData = buildBlogHeatmapData(posts);
 								<BrandIcon name="csdn" size={20} />
 							</a>
 						</nav>
+						<a class="email" href={`mailto:${profile.email}`}>{profile.email}</a>
 					</div>
 					<footer class="identity-foot">
 						<a class="meta-link" href="/archives">
@@ -80,48 +78,74 @@ const heatmapData = buildBlogHeatmapData(posts);
 						<span class="meta-sep" aria-hidden="true">·</span>
 						<a class="meta-link" href="/about">关于</a>
 					</footer>
+					<HomeClock />
 				</article>
 
 				<div class="bento-right">
 					{
-						featured && (
-							<a class="card feature" href={`/blog/${featured.id}/`}>
-								{featured.data.heroImage && (
-									<div class="feature-media">
-										<Image
-											src={featured.data.heroImage}
-											alt=""
-											width={900}
-											height={720}
-											sizes="(max-width: 900px) 100vw, 420px"
-											loading="eager"
-											fetchpriority="high"
-										/>
-										<div class="feature-shade" />
-									</div>
-								)}
-								<div class="feature-copy">
-									<span class="pill">
-										<Icon name="moon" size={12} />
-										最新
-									</span>
-									<h2>{featured.data.title}</h2>
-									<p>{featured.data.description}</p>
-									<span class="when">
-										<FormattedDate date={featured.data.pubDate} />
-										<em aria-hidden="true">
-											阅读 <Icon name="arrow" size={14} />
-										</em>
-									</span>
+						slides.length > 0 && (
+							<div
+								class="feature card"
+								data-interval={FEATURE_INTERVAL_SEC}
+								aria-roledescription="carousel"
+								aria-label="最新文章"
+							>
+								<div class="slides">
+									{slides.map((post, i) => (
+										<div
+											class:list={['slide', i === 0 && 'is-active']}
+											inert={i === 0 ? undefined : true}
+										>
+											<a href={`/blog/${post.id}/`}>
+												<div class="feature-media">
+													<Image
+														src={post.data.heroImage!}
+														alt=""
+														width={900}
+														height={720}
+														sizes="(max-width: 900px) 100vw, 420px"
+														loading={i === 0 ? 'eager' : 'lazy'}
+														fetchpriority={i === 0 ? 'high' : 'low'}
+													/>
+													<div class="feature-shade" />
+												</div>
+												<div class="feature-copy">
+													<span class="pill">
+														<Icon name="moon" size={12} />
+														{i === 0 ? '最新' : '回顾'}
+													</span>
+													<h2>{post.data.title}</h2>
+													<p>{post.data.description}</p>
+													<span class="when">
+														<FormattedDate date={post.data.pubDate} />
+														<em aria-hidden="true">
+															阅读 <Icon name="arrow" size={14} />
+														</em>
+													</span>
+												</div>
+											</a>
+										</div>
+									))}
 								</div>
-							</a>
+								<div class="feature-dots">
+									{slides.map((post, i) => (
+										<button
+											type="button"
+											class:list={['dot', i === 0 && 'is-active']}
+											aria-label={post.data.title}
+										>
+											<span class="dot-fill" style={`--interval:${FEATURE_INTERVAL_SEC}s`} />
+										</button>
+									))}
+								</div>
+							</div>
 						)
 					}
-					<HomeClock />
+					<div class="card">
+						<ArchiveHeatmap data={heatmapData} />
+					</div>
 				</div>
 			</section>
-
-			<ArchiveHeatmap data={heatmapData} />
 
 			<section class="zone categories-zone" data-reveal style="--stagger:1">
 				<header class="zone-head">
@@ -222,6 +246,85 @@ const heatmapData = buildBlogHeatmapData(posts);
 			</section>
 		</main>
 		<Footer />
+		<script>
+			function startFeatureCarousel(): void {
+				const carousel = document.querySelector<HTMLElement>('.feature[data-interval]');
+				if (!carousel) return;
+
+				const slides = [...carousel.querySelectorAll<HTMLElement>('.slide')];
+				const dots = [...carousel.querySelectorAll<HTMLButtonElement>('.dot')];
+				if (slides.length < 2) return;
+
+				const interval = (Number(carousel.dataset.interval) || 7) * 1000;
+				let index = 0;
+				let timer: number | undefined;
+
+				const show = (next: number) => {
+					if (next === index) return;
+					slides[index]?.classList.remove('is-active');
+					slides[index]?.setAttribute('inert', '');
+					slides[next]?.classList.remove('inert');
+					slides[next]?.classList.add('is-active');
+					dots[index]?.classList.remove('is-active');
+					dots[next]?.classList.add('is-active');
+					index = next;
+					// 重新播放入场动画，让新激活的圆点从 0 开始计时
+					dots.forEach((dot, i) => {
+						const fill = dot.querySelector<HTMLElement>('.dot-fill');
+						if (!fill) return;
+						fill.style.animation = 'none';
+						if (i === index) {
+							void fill.offsetWidth;
+							fill.style.animation = '';
+						}
+					});
+				};
+
+				// 悬停/聚焦暂停时，圆点计时与自动播放同步停住
+				const freezeDots = (paused: boolean) => {
+					const fill = dots[index]?.querySelector<HTMLElement>('.dot-fill');
+					if (!fill) return;
+					fill.style.animationPlayState = paused ? 'paused' : 'running';
+				};
+
+				const startTimer = () => {
+					if (timer === undefined) timer = window.setInterval(() => show((index + 1) % slides.length), interval);
+				};
+				const stopTimer = () => {
+					window.clearInterval(timer);
+					timer = undefined;
+				};
+
+				if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+					startTimer();
+					carousel.addEventListener('mouseenter', () => {
+						stopTimer();
+						freezeDots(true);
+					});
+					carousel.addEventListener('mouseleave', () => {
+						startTimer();
+						freezeDots(false);
+					});
+					carousel.addEventListener('focusin', () => {
+						stopTimer();
+						freezeDots(true);
+					});
+					carousel.addEventListener('focusout', () => {
+						startTimer();
+						freezeDots(false);
+					});
+				}
+
+				dots.forEach((dot, i) => dot.addEventListener('click', () => show(i)));
+			}
+
+			document.addEventListener('astro:page-load', startFeatureCarousel);
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', startFeatureCarousel, { once: true });
+			} else {
+				startFeatureCarousel();
+			}
+		</script>
 	</body>
 </html>
 
@@ -258,8 +361,8 @@ const heatmapData = buildBlogHeatmapData(posts);
 	}
 
 	.bento-right {
-		display: flex;
-		flex-direction: column;
+		display: grid;
+		grid-template-rows: minmax(14.5rem, 1fr) auto;
 		gap: 1.1rem;
 		min-width: 0;
 	}
@@ -305,14 +408,9 @@ const heatmapData = buildBlogHeatmapData(posts);
 		color: var(--muted);
 	}
 
-	.who .sep {
-		margin: 0 0.25rem;
-		opacity: 0.55;
-	}
-
 	.email {
 		display: inline-block;
-		margin: 0 0 0.85rem;
+		margin: 0.85rem 0 0;
 		color: var(--ink-soft);
 		font-size: 0.84rem;
 		font-weight: 600;
@@ -408,15 +506,7 @@ const heatmapData = buildBlogHeatmapData(posts);
 	}
 
 	.feature {
-		display: grid;
-		grid-template-columns: minmax(10.5rem, 0.9fr) minmax(0, 1.1fr);
-		text-decoration: none;
-		color: inherit;
-		isolation: isolate;
-		width: 100%;
-		height: 14.5rem;
-		max-height: 14.5rem;
-		flex: 0 0 auto;
+		position: relative;
 		transition:
 			transform 0.3s ease,
 			border-color 0.3s ease,
@@ -427,6 +517,95 @@ const heatmapData = buildBlogHeatmapData(posts);
 		transform: translateY(-2px);
 		border-color: var(--line-strong);
 		box-shadow: var(--shadow-panel-hover);
+	}
+
+	.slides {
+		display: grid;
+		height: 100%;
+	}
+
+	.slide {
+		grid-area: 1 / 1;
+		opacity: 0;
+		visibility: hidden;
+		transition: opacity 0.7s ease, visibility 0.7s;
+	}
+
+	.slide a {
+		display: grid;
+		grid-template-columns: minmax(10.5rem, 0.9fr) minmax(0, 1.1fr);
+		height: 100%;
+		text-decoration: none;
+		color: inherit;
+		isolation: isolate;
+	}
+
+	.slide.is-active {
+		opacity: 1;
+		visibility: visible;
+	}
+
+	.slide a:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: -2px;
+	}
+
+	.feature-dots {
+		position: absolute;
+		z-index: 2;
+		left: 50%;
+		bottom: 0.55rem;
+		transform: translateX(-50%);
+		display: flex;
+		gap: 0.35rem;
+		padding: 0.28rem 0.45rem;
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--glass) 82%, transparent);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+	}
+
+	.dot {
+		appearance: none;
+		position: relative;
+		width: 0.42rem;
+		height: 0.42rem;
+		padding: 0;
+		border: 0;
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--muted) 55%, transparent);
+		overflow: hidden;
+		cursor: pointer;
+		transition: width 0.3s ease, background 0.3s ease;
+	}
+
+	.dot:hover {
+		background: var(--muted);
+	}
+
+	.dot.is-active {
+		width: 1.15rem;
+		background: color-mix(in srgb, var(--accent) 28%, transparent);
+	}
+
+	/* 进度填充：宽度在 interval 秒内线性铺满，与自动切换同步 */
+	.dot-fill {
+		position: absolute;
+		inset: 0;
+		transform-origin: left center;
+		transform: scaleX(0);
+		background: var(--accent);
+	}
+
+	.dot.is-active .dot-fill {
+		animation: dot-progress var(--interval, 7s) linear forwards;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.dot.is-active .dot-fill {
+			animation: none;
+			transform: scaleX(1);
+		}
 	}
 
 	.feature-media {
@@ -440,11 +619,25 @@ const heatmapData = buildBlogHeatmapData(posts);
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		transition: transform 0.7s ease;
+		transition: transform 1.4s ease;
 	}
 
-	.feature:hover .feature-media :global(img) {
-		transform: scale(1.05);
+	.slide.is-active .feature-media :global(img) {
+		animation: feature-drift 14s ease-out both;
+	}
+
+	.feature:hover .slide.is-active .feature-media :global(img) {
+		animation: none;
+		transform: scale(1.1);
+	}
+
+	@keyframes feature-drift {
+		from {
+			transform: scale(1.015);
+		}
+		to {
+			transform: scale(1.07);
+		}
 	}
 
 	.feature-shade {
@@ -461,16 +654,12 @@ const heatmapData = buildBlogHeatmapData(posts);
 	.feature-copy {
 		position: relative;
 		z-index: 1;
-		padding: 1.25rem 1.3rem 1.2rem;
+		padding: 1.25rem 1.3rem 1.85rem;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		gap: 0.45rem;
-		background: linear-gradient(
-			160deg,
-			color-mix(in srgb, var(--glass) 92%, transparent),
-			color-mix(in srgb, var(--glass) 70%, transparent)
-		);
+		background: none;
 	}
 
 	.pill {
@@ -824,10 +1013,16 @@ const heatmapData = buildBlogHeatmapData(posts);
 			grid-template-columns: 1fr;
 		}
 
-		.feature {
+		.bento-right {
+			grid-template-rows: auto auto;
+		}
+
+		.slide a {
 			grid-template-columns: 1fr;
-			height: auto;
-			max-height: none;
+		}
+
+		.feature {
+			min-height: 0;
 		}
 
 		.feature-media {

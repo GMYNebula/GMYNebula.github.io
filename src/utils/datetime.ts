@@ -11,9 +11,13 @@ const DATETIME_OPTS: Intl.DateTimeFormatOptions = {
 	hour12: false,
 };
 
-/** frontmatter 仅日期（时间为 0 点）时不显示时分 */
+/**
+ * frontmatter 仅日期时不显示时分。
+ * 只写日期会被解析成 UTC 零点，本地 getHours() 在 UTC 以东会是非零值，
+ * 所以改用 UTC 分量判断，结果不随构建机时区变化。
+ */
 export function hasExplicitTime(date: Date): boolean {
-	return date.getHours() !== 0 || date.getMinutes() !== 0 || date.getSeconds() !== 0;
+	return date.getUTCHours() !== 0 || date.getUTCMinutes() !== 0 || date.getUTCSeconds() !== 0;
 }
 
 export function formatDateTime(input: Date | string): string {

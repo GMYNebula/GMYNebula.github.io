@@ -45,7 +45,13 @@ export default defineConfig({
 			proxy: { ...giscusApiProxy },
 		},
 	},
-	integrations: [expressiveCode(), mdx(), sitemap()],
+	integrations: [
+		expressiveCode(),
+		mdx(),
+		sitemap({
+			filter: (page) => !page.endsWith('/dev/code-themes/') && !page.endsWith('/blog/'),
+		}),
+	],
 	markdown: {
 		syntaxHighlight: false,
 		processor: unified({
@@ -89,22 +95,6 @@ export default defineConfig({
 		}),
 	},
 	fonts: [
-		{
-			provider: fontProviders.local(),
-			name: 'ZCOOL XiaoWei',
-			cssVariable: '--font-display-cjk',
-			fallbacks: ['KaiTi', 'STKaiti', 'Songti SC', 'serif'],
-			options: {
-				variants: [
-					{
-						src: ['./src/assets/fonts/cute/zcool-xiaowei-chinese-simplified-400-normal.woff2'],
-						weight: 400,
-						style: 'normal',
-						display: 'swap',
-					},
-				],
-			},
-		},
 		{
 			provider: fontProviders.local(),
 			name: 'Fredoka',

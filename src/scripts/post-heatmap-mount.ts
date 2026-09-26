@@ -3,10 +3,10 @@ import type { HeatmapData } from '@rsalianto/git-heatmap-core';
 
 type GitHeatmapEl = HTMLElement & { data: HeatmapData | null };
 
-const DAY_LABEL_W = 32;
+const DAY_LABEL_W = 0;
 const CELL_GAP = 3;
 const MIN_CELL = 7;
-const MAX_CELL = 18;
+const MAX_CELL = 22;
 
 let bound = false;
 

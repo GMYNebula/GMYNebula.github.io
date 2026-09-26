@@ -135,7 +135,10 @@ const slugList = flat.map((h) => h.slug);
 		border-bottom: 1px dashed var(--line);
 	}
 
-	@media (min-width: 1280px) {
+	/* 侧边目录改为 fixed 后占的是 shell 之外的宽度：
+	   shell 860 + gap 28 + 目录 220 = 1108，两侧各留 1.25rem，
+	   视口需 ≥ 1356px，取整 1360px。低于此宽度仍用折叠式目录。 */
+	@media (min-width: 1360px) {
 		.toc-mobile {
 			display: none;
 		}

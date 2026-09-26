@@ -185,6 +185,16 @@
 	}
 }
 
+/* 精选轮播：当前圆点的「还剩几秒」进度填充 */
+@keyframes dot-progress {
+	from {
+		transform: scaleX(0);
+	}
+	to {
+		transform: scaleX(1);
+	}
+}
+
 @media (prefers-reduced-motion: no-preference) {
 	.avatar-pendant__lift {
 		animation: avatar-float 3.8s ease-in-out infinite;
