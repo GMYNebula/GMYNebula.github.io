@@ -39,58 +39,69 @@ function formatDuration(seconds: number) {
 						</button>
 					</div>
 				</nav>
-				{groups.map((group) => (
-					<details class="group" id={`group-${group.id}`} open>
-						<summary>
-							<h2>
-								<Icon name="chevron-down" size={18} class="chevron" />
-								{group.name}
-								<span>{group.items.length}</span>
-							</h2>
-						</summary>
-						<ul class="grid">
-							{group.items.map((item) => (
-								<li>
-									<a class="bookmark surface" href={item.url} target="_blank" rel="noopener noreferrer">
-										{item.image && (
-											<div class="cover">
-												<img
-													src={item.image}
-													alt=""
-													loading="lazy"
-													decoding="async"
-													referrerpolicy="no-referrer"
-													onerror="this.parentElement.classList.add('broken')"
-												/>
-												{item.duration !== undefined && (
-													<span class="duration">{formatDuration(item.duration)}</span>
-												)}
-											</div>
-										)}
-										<div class="info">
-											<h3>{item.title}</h3>
-											{item.description && <p class="desc">{item.description}</p>}
-											{item.note && <p class="note">{item.note}</p>}
-											<p class="source">
-												{item.icon && (
+				{groups.map((group, i) => (
+					<>
+						{i > 0 && (
+							<div class="divider" aria-hidden="true">
+								<span class="paws">
+									<Icon name="paw" size={12} />
+									<Icon name="paw" size={18} />
+									<Icon name="paw" size={12} />
+								</span>
+							</div>
+						)}
+						<details class="group" id={`group-${group.id}`} open>
+							<summary>
+								<h2>
+									<Icon name="chevron-down" size={18} class="chevron" />
+									{group.name}
+									<span>{group.items.length}</span>
+								</h2>
+							</summary>
+							<ul class="grid">
+								{group.items.map((item) => (
+									<li>
+										<a class="bookmark surface" href={item.url} target="_blank" rel="noopener noreferrer">
+											{item.image && (
+												<div class="cover">
 													<img
-														class="favicon"
-														src={item.icon}
+														src={item.image}
 														alt=""
-														width="14"
-														height="14"
+														loading="lazy"
+														decoding="async"
 														referrerpolicy="no-referrer"
-														onerror="this.remove()"
+														onerror="this.parentElement.classList.add('broken')"
 													/>
-												)}
-												{item.source}
-											</p>
-										</div>
-									</a>
-								</li>
-							))}
-						</ul>
-					</details>
+													{item.duration !== undefined && (
+														<span class="duration">{formatDuration(item.duration)}</span>
+													)}
+												</div>
+											)}
+											<div class="info">
+												<h3>{item.title}</h3>
+												{item.description && <p class="desc">{item.description}</p>}
+												{item.note && <p class="note">{item.note}</p>}
+												<p class="source">
+													{item.icon && (
+														<img
+															class="favicon"
+															src={item.icon}
+															alt=""
+															width="14"
+															height="14"
+															referrerpolicy="no-referrer"
+															onerror="this.remove()"
+														/>
+													)}
+													{item.source}
+												</p>
+											</div>
+										</a>
+									</li>
+								))}
+							</ul>
+						</details>
+					</>
 				))}
 			</>
 		)
@@ -215,8 +226,49 @@ function formatDuration(seconds: number) {
 		border-top: 1px dashed var(--line);
 	}
 
-	.group + .group {
-		margin-top: 1.5rem;
+	.divider {
+		display: flex;
+		align-items: center;
+		gap: 1.1rem;
+		margin: 2.5rem 0 1.75rem;
+		color: var(--accent);
+	}
+
+	.divider::before,
+	.divider::after {
+		content: '';
+		flex: 1;
+		height: 2px;
+		border-radius: 999px;
+	}
+
+	.divider::before {
+		background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 45%, transparent));
+	}
+
+	.divider::after {
+		background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 45%, transparent), transparent);
+	}
+
+	/* 左右对称：中间大而实，两侧小而淡并朝外微斜；图标本身斜 45°，-45deg 才是正的 */
+	.paws {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.paws :global(svg) {
+		transform: rotate(-45deg);
+	}
+
+	.paws :global(svg:first-child) {
+		opacity: 0.45;
+		transform: rotate(-65deg);
+	}
+
+	.paws :global(svg:last-child) {
+		opacity: 0.45;
+		transform: rotate(-25deg);
 	}
 
 	summary {
