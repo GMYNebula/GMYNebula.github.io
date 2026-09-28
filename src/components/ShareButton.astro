@@ -1,0 +1,121 @@
+---
+import { SITE_TAGLINE, SITE_TITLE } from '../consts';
+import { profile } from '../data/profile';
+import Icon from './Icon.astro';
+
+interface Props {
+	/** 站内路径，二维码里会拼成正式域名的完整地址 */
+	path: string;
+	title?: string;
+	text?: string;
+	date: string;
+}
+
+const { path, title, text, date } = Astro.props;
+const url = new URL(path, Astro.site).href;
+---
+
+<button
+	type="button"
+	class="share-button"
+	data-share
+	data-share-url={url}
+	data-share-title={title}
+	data-share-text={text}
+	data-share-date={date}
+	data-share-site={SITE_TITLE}
+	data-share-tagline={SITE_TAGLINE}
+	data-share-icon={profile.icon}
+>
+	<Icon name="share" size={14} />
+	转发
+</button>
+
+<script>
+	import { initShareCard } from '../scripts/share-card';
+	initShareCard();
+</script>
+
+<style>
+	.share-button {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		padding: 0.25rem 0.7rem;
+		border: 1px solid var(--line);
+		border-radius: 999px;
+		background: transparent;
+		color: var(--muted);
+		font: inherit;
+		font-size: 0.78rem;
+		cursor: pointer;
+		transition:
+			border-color 0.15s ease,
+			color 0.15s ease,
+			background 0.15s ease;
+	}
+
+	.share-button:hover {
+		border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+		background: var(--accent-glow);
+		color: var(--accent-deep);
+	}
+</style>
+
+<!-- 弹窗由脚本创建在 body 下，样式只能写成全局 -->
+<style is:global>
+	.share-dialog {
+		width: min(26rem, calc(100% - 2rem));
+		padding: 1rem;
+		border: 1px solid var(--line);
+		border-radius: 1rem;
+		background: var(--surface);
+		color: var(--ink);
+		box-shadow: var(--shadow-panel);
+	}
+
+	.share-dialog::backdrop {
+		background: rgba(0, 0, 0, 0.45);
+		backdrop-filter: blur(4px);
+	}
+
+	.share-dialog img {
+		display: block;
+		width: 100%;
+		border-radius: 0.6rem;
+		border: 1px solid var(--line);
+	}
+
+	.share-dialog p {
+		margin: 0.75rem 0 0;
+		font-size: 0.8rem;
+		color: var(--muted);
+		text-align: center;
+	}
+
+	.share-actions {
+		display: flex;
+		justify-content: center;
+		gap: 0.5rem;
+		margin-top: 0.75rem;
+	}
+
+	.share-actions a,
+	.share-actions button {
+		padding: 0.4rem 0.95rem;
+		border: 1px solid var(--line);
+		border-radius: 999px;
+		background: transparent;
+		color: var(--ink-soft);
+		font: inherit;
+		font-size: 0.84rem;
+		text-decoration: none;
+		cursor: pointer;
+	}
+
+	.share-actions a {
+		border-color: var(--accent);
+		background: var(--accent);
+		color: #fff;
+	}
+</style>

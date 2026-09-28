@@ -17,6 +17,21 @@ export type BookmarkMeta = {
 
 const metaMap = metaJson as Record<string, BookmarkMeta>;
 
+/** 网址 → 卡片展示信息；没抓到元数据时标题退回域名 */
+export function getLinkCard(url: string) {
+	const meta = metaMap[url];
+	const host = new URL(url).hostname.replace(/^www\./, '');
+	return {
+		url,
+		title: meta?.title ?? host,
+		description: meta?.description,
+		image: meta?.image,
+		source: meta?.author ? `${meta.siteName} · ${meta.author}` : host,
+		icon: meta?.type === 'page' ? meta.icon : undefined,
+		duration: meta?.duration,
+	};
+}
+
 export async function getBookmarkGroups() {
 	const groups = await getCollection('bookmarks');
 	return groups
@@ -25,17 +40,13 @@ export async function getBookmarkGroups() {
 			id: group.id,
 			name: group.data.title,
 			items: group.data.links.map((link) => {
-				const meta = metaMap[link.url];
-				const host = new URL(link.url).hostname.replace(/^www\./, '');
+				const card = getLinkCard(link.url);
 				return {
-					url: link.url,
+					...card,
 					note: link.note,
-					title: link.title ?? meta?.title ?? host,
-					description: link.description ?? meta?.description,
-					image: link.cover ?? meta?.image,
-					source: meta?.author ? `${meta.siteName} · ${meta.author}` : host,
-					icon: meta?.type === 'page' ? meta.icon : undefined,
-					duration: meta?.duration,
+					title: link.title ?? card.title,
+					description: link.description ?? card.description,
+					image: link.cover ?? card.image,
 				};
 			}),
 		}));

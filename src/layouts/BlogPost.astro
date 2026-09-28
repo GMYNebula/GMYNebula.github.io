@@ -7,9 +7,11 @@ import Icon from '../components/Icon.astro';
 import PostLicense from '../components/PostLicense.astro';
 import PostNav from '../components/PostNav.astro';
 import ReadingProgress from '../components/ReadingProgress.astro';
+import ShareButton from '../components/ShareButton.astro';
 import TableOfContents from '../components/TableOfContents.astro';
 import { getCategoryMeta } from '../data/categories';
 import { categoryToSlug, topicTags } from '../utils/categories';
+import { formatDateTime } from '../utils/datetime';
 import { tagToSlug } from '../utils/tags';
 import { formatWordCount } from '../utils/word-count';
 import PageLayout from './PageLayout.astro';
@@ -121,6 +123,15 @@ const displayTags = categoryMeta ? topicTags(tags, categoryMeta.name) : tags;
 									</section>
 
 									{license && <PostLicense title={title} pubDate={pubDate} />}
+
+									<div class="share-row" data-pagefind-ignore>
+										<ShareButton
+											path={Astro.url.pathname}
+											title={title}
+											text={description}
+											date={formatDateTime(pubDate)}
+										/>
+									</div>
 								</div>
 							</article>
 
@@ -317,6 +328,12 @@ const displayTags = categoryMeta ? topicTags(tags, categoryMeta.name) : tags;
 
 	.content {
 		margin-bottom: 0;
+	}
+
+	.share-row {
+		display: flex;
+		justify-content: flex-end;
+		margin-top: 1rem;
 	}
 
 	.comments-zone {

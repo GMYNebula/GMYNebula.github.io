@@ -1,9 +1,10 @@
-// 抓取 src/content/bookmarks/*.md 里新增网址的标题、简介、封面，写入 bookmarks-meta.json。
+// 抓取收藏（bookmarks/*.md 的 links）和动态（moments/*.md 的 link）里新增网址的标题、简介、封面，写入 bookmarks-meta.json。
 // 已抓过的跳过；想重抓某条，就从 json 里删掉它再运行。
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import yaml from 'js-yaml';
 
-const CONTENT_DIR = new URL('../src/content/bookmarks/', import.meta.url);
+const BOOKMARKS_DIR = new URL('../src/content/bookmarks/', import.meta.url);
+const MOMENTS_DIR = new URL('../src/content/moments/', import.meta.url);
 const META_PATH = new URL('../src/data/bookmarks-meta.json', import.meta.url);
 const HEADERS = {
 	'User-Agent':
@@ -13,11 +14,11 @@ const HEADERS = {
 
 const meta = JSON.parse(await readFile(META_PATH, 'utf8'));
 const urls = new Set();
-for (const file of await readdir(CONTENT_DIR).catch(() => [])) {
-	if (!file.endsWith('.md')) continue;
-	const source = await readFile(new URL(file, CONTENT_DIR), 'utf8');
-	const frontmatter = source.match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] ?? '';
-	for (const link of yaml.load(frontmatter)?.links ?? []) urls.add(link.url);
+for (const data of await readFrontmatters(BOOKMARKS_DIR)) {
+	for (const link of data?.links ?? []) urls.add(link.url);
+}
+for (const data of await readFrontmatters(MOMENTS_DIR)) {
+	if (data?.link) urls.add(data.link);
 }
 
 for (const url of Object.keys(meta)) {
@@ -35,6 +36,16 @@ for (const url of urls) {
 }
 
 await writeFile(META_PATH, JSON.stringify(meta, null, '\t') + '\n');
+
+async function readFrontmatters(dir) {
+	const result = [];
+	for (const file of await readdir(dir).catch(() => [])) {
+		if (!file.endsWith('.md')) continue;
+		const source = await readFile(new URL(file, dir), 'utf8');
+		result.push(yaml.load(source.match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] ?? ''));
+	}
+	return result;
+}
 
 async function fetchMeta(url) {
 	const bvid = new URL(url).hostname.endsWith('bilibili.com') && url.match(/BV[0-9A-Za-z]{10}/)?.[0];

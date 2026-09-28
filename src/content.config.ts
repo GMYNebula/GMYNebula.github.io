@@ -32,6 +32,11 @@ const moments = defineCollection({
 		date: z.coerce.date(),
 		/** 外链图片地址 */
 		images: z.array(z.string().url()).default([]),
+		mood: z.string().optional(),
+		location: z.string().default('北京'),
+		tags: z.array(z.string()).default([]),
+		/** 分享的网址，显示成卡片；标题封面由 npm run bookmarks 抓取 */
+		link: z.string().url().optional(),
 		draft: z.boolean().default(false),
 	}),
 });
