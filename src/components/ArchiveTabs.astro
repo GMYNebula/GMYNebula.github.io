@@ -1,0 +1,65 @@
+---
+import { archiveSections } from '../data/nav';
+import Icon from './Icon.astro';
+
+interface Props {
+	current: string;
+}
+
+const { current } = Astro.props;
+---
+
+<nav class="archive-tabs" aria-label="归档">
+	{
+		archiveSections.map((item) => (
+			<a
+				href={item.href}
+				class:list={{ active: item.href === current }}
+				aria-current={item.href === current ? 'page' : undefined}
+			>
+				<Icon name={item.icon} size={14} />
+				{item.label}
+			</a>
+		))
+	}
+</nav>
+
+<style>
+	/* 三个子页宽度不同，居中才能让切换时标签栏不跳位 */
+	.archive-tabs {
+		display: flex;
+		gap: 0.25rem;
+		width: fit-content;
+		margin: 0 auto 1.75rem;
+		padding: 0.28rem;
+		border: 1px solid var(--line);
+		border-radius: 999px;
+		background: var(--glass);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+	}
+
+	a {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		padding: 0.4rem 0.95rem;
+		border-radius: 999px;
+		color: var(--muted);
+		font-size: 0.88rem;
+		font-weight: 600;
+		text-decoration: none;
+		transition:
+			background 0.15s ease,
+			color 0.15s ease;
+	}
+
+	a:hover:not(.active) {
+		color: var(--ink-soft);
+	}
+
+	a.active {
+		background: var(--accent-glow);
+		color: var(--accent-deep);
+	}
+</style>

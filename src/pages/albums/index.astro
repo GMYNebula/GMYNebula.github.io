@@ -1,0 +1,101 @@
+---
+import FormattedDate from '../../components/FormattedDate.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import { SITE_TITLE } from '../../consts';
+import PageLayout from '../../layouts/PageLayout.astro';
+import { getPublishedAlbums } from '../../utils/albums';
+
+const albums = await getPublishedAlbums();
+---
+
+<PageLayout title={`相册 · ${SITE_TITLE}`} description="走过的地方，拍下的光" width="wide">
+	<PageHeader title="相册" eyebrow="Albums" icon="image" lede="走过的地方，拍下的光" />
+	{
+		albums.length === 0 ? (
+			<p class="empty">还没有相册喵～</p>
+		) : (
+			<ul class="albums">
+				{albums.map((album) => (
+					<li>
+						<a class="album surface" href={`/albums/${album.id}/`}>
+							<img src={album.data.cover} alt="" loading="lazy" decoding="async" />
+							<div class="info">
+								<h2>{album.data.title}</h2>
+								<p class="meta">
+									<FormattedDate date={album.data.date} />
+									{album.data.location && <span>{album.data.location}</span>}
+									<span>{album.data.photos.length} 张</span>
+								</p>
+							</div>
+						</a>
+					</li>
+				))}
+			</ul>
+		)
+	}
+</PageLayout>
+
+<style>
+	.empty {
+		color: var(--muted);
+	}
+
+	.albums {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+		gap: 1.1rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.album {
+		display: block;
+		overflow: hidden;
+		color: inherit;
+		text-decoration: none;
+		animation: rise 0.55s ease backwards;
+		transition:
+			transform 0.2s ease,
+			border-color 0.2s ease;
+	}
+
+	.album:hover {
+		transform: translateY(-3px);
+		border-color: var(--accent);
+	}
+
+	img {
+		width: 100%;
+		aspect-ratio: 4 / 3;
+		object-fit: cover;
+		/* 竖图居中裁会切掉人物头部 */
+		object-position: center 25%;
+		transition: transform 0.4s ease;
+	}
+
+	.album:hover img {
+		transform: scale(1.04);
+	}
+
+	.info {
+		position: relative;
+		padding: 0.8rem 1rem 0.95rem;
+		background: var(--surface);
+	}
+
+	h2 {
+		margin: 0;
+		font-size: 1.1rem;
+	}
+
+	.meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.2rem 0.8rem;
+		margin: 0.35rem 0 0;
+		font-size: 0.8rem;
+		color: var(--muted);
+	}
+
+</style>

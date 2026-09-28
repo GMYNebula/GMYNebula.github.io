@@ -1,8 +1,6 @@
 ---
 import { createHighlighter } from 'shiki';
-import BaseHead from '../../components/BaseHead.astro';
-import Footer from '../../components/Footer.astro';
-import Header from '../../components/Header.astro';
+import PageLayout from '../../layouts/PageLayout.astro';
 
 const lightCandidates = [
 	{ id: 'ayu-light', note: '当前日间 · Ayu Light' },
@@ -67,80 +65,70 @@ const darkBlocks = darkCandidates.map(({ id, note }) => ({
 }));
 ---
 
-<html lang="zh-CN">
-	<head>
-		<BaseHead
-			title="代码主题预览（仅开发）"
-			description="本地对比 Shiki 日间 / 夜间代码块主题，无需访问外网。"
-		/>
-		<meta name="robots" content="noindex, nofollow" />
-	</head>
-	<body>
-		<Header />
-		<main class="dev-themes">
-			<section class="intro glass">
-				<h1>代码主题预览</h1>
-				<p>
-					仅 <code>npm run dev</code> 下可用。这里只看<strong>语法配色</strong>；正式接入请在
-					<code>ec.config.mjs</code> 里改 <code>themes: ['夜间', '日间']</code>，再到
-					<a href="/blog/markdown-playground/">Markdown 小实验场</a> 看 Expressive Code 外框效果。
-				</p>
-				<p class="hint">选定后告诉我编号或主题名，例如「日间 B · catppuccin-latte」。</p>
-			</section>
+<PageLayout title="代码主题预览（仅开发）" description="本地对比 Shiki 日间 / 夜间代码块主题，无需访问外网。">
+	<meta slot="head" name="robots" content="noindex, nofollow" />
+	<main class="dev-themes">
+		<section class="intro glass">
+			<h1>代码主题预览</h1>
+			<p>
+				仅 <code>npm run dev</code> 下可用。这里只看<strong>语法配色</strong>；正式接入请在
+				<code>ec.config.mjs</code> 里改 <code>themes: ['夜间', '日间']</code>，再到
+				<a href="/blog/markdown-playground/">Markdown 小实验场</a> 看 Expressive Code 外框效果。
+			</p>
+			<p class="hint">选定后告诉我编号或主题名，例如「日间 B · catppuccin-latte」。</p>
+		</section>
 
-			<section class="group">
-				<h2>日间候选（sites 切到日间再看背景融合）</h2>
-				<div class="grid">
-					{
-						lightBlocks.map(({ id, note, html }) => (
-							<article class="theme-card glass">
-								<header>
-									<h3>{id}</h3>
-									<p>{note}</p>
-								</header>
-								<div class="shiki-wrap" set:html={html} />
-							</article>
-						))
-					}
-				</div>
-			</section>
+		<section class="group">
+			<h2>日间候选（sites 切到日间再看背景融合）</h2>
+			<div class="grid">
+				{
+					lightBlocks.map(({ id, note, html }) => (
+						<article class="theme-card glass">
+							<header>
+								<h3>{id}</h3>
+								<p>{note}</p>
+							</header>
+							<div class="shiki-wrap" set:html={html} />
+						</article>
+					))
+				}
+			</div>
+		</section>
 
-			<section class="group">
-				<h2>夜间候选（sites 切到夜间）</h2>
-				<div class="grid">
-					{
-						darkBlocks.map(({ id, note, html }) => (
-							<article class="theme-card glass">
-								<header>
-									<h3>{id}</h3>
-									<p>{note}</p>
-								</header>
-								<div class="shiki-wrap" set:html={html} />
-							</article>
-						))
-					}
-				</div>
-			</section>
+		<section class="group">
+			<h2>夜间候选（sites 切到夜间）</h2>
+			<div class="grid">
+				{
+					darkBlocks.map(({ id, note, html }) => (
+						<article class="theme-card glass">
+							<header>
+								<h3>{id}</h3>
+								<p>{note}</p>
+							</header>
+							<div class="shiki-wrap" set:html={html} />
+						</article>
+					))
+				}
+			</div>
+		</section>
 
-			<section class="group">
-				<h2>终端样式参考（bash）</h2>
-				<div class="grid grid-compact">
-					{
-						['ayu-light', 'catppuccin-latte', 'vitesse-light'].map((id) => (
-							<article class="theme-card glass">
-								<header>
-									<h3>{id}</h3>
-								</header>
-								<div class="shiki-wrap" set:html={render(bashSample, 'bash', id)} />
-							</article>
-						))
-					}
-				</div>
-			</section>
-		</main>
-		<Footer />
-	</body>
-</html>
+		<section class="group">
+			<h2>终端样式参考（bash）</h2>
+			<div class="grid grid-compact">
+				{
+					['ayu-light', 'catppuccin-latte', 'vitesse-light'].map((id) => (
+						<article class="theme-card glass">
+							<header>
+								<h3>{id}</h3>
+							</header>
+							<div class="shiki-wrap" set:html={render(bashSample, 'bash', id)} />
+						</article>
+					))
+				}
+			</div>
+		</section>
+	</main>
+</PageLayout>
 
 <style>
 	.dev-themes {

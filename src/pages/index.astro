@@ -2,12 +2,9 @@
 import { Image } from 'astro:assets';
 import ArchiveHeatmap from '../components/ArchiveHeatmap.astro';
 import AvatarPendant from '../components/AvatarPendant.astro';
-import BaseHead from '../components/BaseHead.astro';
 import BrandIcon from '../components/BrandIcon.astro';
 import CategoryChip from '../components/CategoryChip.astro';
-import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
-import Header from '../components/Header.astro';
 import HomeClock from '../components/HomeClock.astro';
 import Icon from '../components/Icon.astro';
 import {
@@ -17,6 +14,7 @@ import {
 	SITE_TITLE,
 } from '../consts';
 import { profile } from '../data/profile';
+import PageLayout from '../layouts/PageLayout.astro';
 import { getAllCategories } from '../utils/categories';
 import { getPublishedPosts } from '../utils/posts';
 import { buildBlogHeatmapData } from '../utils/post-heatmap';
@@ -34,299 +32,287 @@ const categories = await getAllCategories();
 const heatmapData = buildBlogHeatmapData(posts);
 ---
 
-<!doctype html>
-<html lang="zh-CN">
-	<head>
-		<BaseHead
-			title={SITE_TITLE}
-			description={SITE_DESCRIPTION}
-			image={featured?.data.heroImage}
-		/>
-	</head>
-	<body>
-		<Header />
-		<main class="home">
-			<section class="bento top">
-				<article class="card identity">
-					<div class="glow" aria-hidden="true"></div>
-					<AvatarPendant alt={`${SITE_AUTHOR} 头像`} size="11rem" width={176} height={176} />
-					<div class="identity-main">
-						<h1 class="brand">{SITE_TITLE}</h1>
-						<p class="who">{SITE_AUTHOR_EN}</p>
-						<p class="bio">学习分享代码知识，记录日常。</p>
-						<nav class="social-row" aria-label="社交链接">
-							<a href={profile.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
-								<BrandIcon name="github" size={20} />
-							</a>
-							<a href={profile.bilibili} target="_blank" rel="noopener noreferrer" aria-label="Bilibili">
-								<BrandIcon name="bilibili" size={20} />
-							</a>
-							<a href={profile.csdn} target="_blank" rel="noopener noreferrer" aria-label="CSDN">
-								<BrandIcon name="csdn" size={20} />
-							</a>
-						</nav>
-						<a class="email" href={`mailto:${profile.email}`}>{profile.email}</a>
-					</div>
-					<footer class="identity-foot">
-						<a class="meta-link" href="/archives">
-							<strong>{postCount}</strong> 篇文章
+<PageLayout title={SITE_TITLE} description={SITE_DESCRIPTION} image={featured?.data.heroImage}>
+	<main class="home">
+		<section class="bento top">
+			<article class="card identity">
+				<div class="glow" aria-hidden="true"></div>
+				<AvatarPendant alt={`${SITE_AUTHOR} 头像`} size="11rem" width={176} height={176} />
+				<div class="identity-main">
+					<h1 class="brand">{SITE_TITLE}</h1>
+					<p class="who">{SITE_AUTHOR_EN}</p>
+					<p class="bio">学习分享代码知识，记录日常。</p>
+					<nav class="social-row" aria-label="社交链接">
+						<a href={profile.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+							<BrandIcon name="github" size={20} />
 						</a>
-						<span class="meta-sep" aria-hidden="true">·</span>
-						<a class="meta-link" href="/categories">分类</a>
-						<span class="meta-sep" aria-hidden="true">·</span>
-						<a class="meta-link" href="/archives">归档</a>
-						<span class="meta-sep" aria-hidden="true">·</span>
-						<a class="meta-link" href="/about">关于</a>
-					</footer>
-					<HomeClock />
-				</article>
-
-				<div class="bento-right">
-					{
-						slides.length > 0 && (
-							<div
-								class="feature card"
-								data-interval={FEATURE_INTERVAL_SEC}
-								aria-roledescription="carousel"
-								aria-label="最新文章"
-							>
-								<div class="slides">
-									{slides.map((post, i) => (
-										<div
-											class:list={['slide', i === 0 && 'is-active']}
-											inert={i === 0 ? undefined : true}
-										>
-											<a href={`/blog/${post.id}/`}>
-												<div class="feature-media">
-													<Image
-														src={post.data.heroImage!}
-														alt=""
-														width={900}
-														height={720}
-														sizes="(max-width: 900px) 100vw, 420px"
-														loading={i === 0 ? 'eager' : 'lazy'}
-														fetchpriority={i === 0 ? 'high' : 'low'}
-													/>
-													<div class="feature-shade" />
-												</div>
-												<div class="feature-copy">
-													<span class="pill">
-														<Icon name="moon" size={12} />
-														{i === 0 ? '最新' : '回顾'}
-													</span>
-													<h2>{post.data.title}</h2>
-													<p>{post.data.description}</p>
-													<span class="when">
-														<FormattedDate date={post.data.pubDate} />
-														<em aria-hidden="true">
-															阅读 <Icon name="arrow" size={14} />
-														</em>
-													</span>
-												</div>
-											</a>
-										</div>
-									))}
-								</div>
-								<div class="feature-dots">
-									{slides.map((post, i) => (
-										<button
-											type="button"
-											class:list={['dot', i === 0 && 'is-active']}
-											aria-label={post.data.title}
-										>
-											<span class="dot-fill" style={`--interval:${FEATURE_INTERVAL_SEC}s`} />
-										</button>
-									))}
-								</div>
-							</div>
-						)
-					}
-					<div class="card">
-						<ArchiveHeatmap data={heatmapData} />
-					</div>
+						<a href={profile.bilibili} target="_blank" rel="noopener noreferrer" aria-label="Bilibili">
+							<BrandIcon name="bilibili" size={20} />
+						</a>
+						<a href={profile.csdn} target="_blank" rel="noopener noreferrer" aria-label="CSDN">
+							<BrandIcon name="csdn" size={20} />
+						</a>
+					</nav>
+					<a class="email" href={`mailto:${profile.email}`}>{profile.email}</a>
 				</div>
-			</section>
-
-			<section class="zone categories-zone" data-reveal style="--stagger:1">
-				<header class="zone-head">
-					<h2><Icon name="layers" size={18} /> 分类</h2>
-					<a class="zone-more" href="/categories">
-						全部 <Icon name="arrow" size={13} />
+				<footer class="identity-foot">
+					<a class="meta-link" href="/archives">
+						<strong>{postCount}</strong> 篇文章
 					</a>
-				</header>
-				<ul class="category-cards">
-					{
-						categories.map((cat, i) => (
-							<li data-reveal style={`--stagger:${i}`}>
-								<a class={`category-card tone-${cat.tone}`} href={`/categories/${cat.name}/`}>
-									<span class="cat-icon" aria-hidden="true">
-										<Icon name={cat.icon} size={20} />
-									</span>
-									<span class="cat-copy">
-										<strong>{cat.name}</strong>
-										<span class="cat-desc">{cat.description}</span>
-									</span>
-									<span class="cat-count">{cat.count} 篇</span>
-								</a>
-							</li>
-						))
-					}
-				</ul>
-			</section>
+					<span class="meta-sep" aria-hidden="true">·</span>
+					<a class="meta-link" href="/categories">分类</a>
+					<span class="meta-sep" aria-hidden="true">·</span>
+					<a class="meta-link" href="/archives">归档</a>
+					<span class="meta-sep" aria-hidden="true">·</span>
+					<a class="meta-link" href="/about">关于</a>
+				</footer>
+				<HomeClock />
+			</article>
 
-			<section class="bento bottom" data-reveal style="--stagger:2">
+			<div class="bento-right">
 				{
-					recent.length > 0 && (
-						<div class="card panel">
-							<header class="panel-head">
-								<h2>
-									<Icon name="blog" size={17} /> 最近更新
-								</h2>
-								<a href="/archives">
-									归档 <Icon name="arrow" size={13} />
-								</a>
-							</header>
-							<ol class="recent">
-								{recent.map((post) => (
-									<li>
+					slides.length > 0 && (
+						<div
+							class="feature card"
+							data-interval={FEATURE_INTERVAL_SEC}
+							aria-roledescription="carousel"
+							aria-label="最新文章"
+						>
+							<div class="slides">
+								{slides.map((post, i) => (
+									<div
+										class:list={['slide', i === 0 && 'is-active']}
+										inert={i === 0 ? undefined : true}
+									>
 										<a href={`/blog/${post.id}/`}>
-											{post.data.heroImage ? (
-												<span class="thumb">
-													<Image src={post.data.heroImage} alt="" width={120} height={80} />
+											<div class="feature-media">
+												<Image
+													src={post.data.heroImage!}
+													alt=""
+													width={900}
+													height={720}
+													sizes="(max-width: 900px) 100vw, 420px"
+													loading={i === 0 ? 'eager' : 'lazy'}
+													fetchpriority={i === 0 ? 'high' : 'low'}
+												/>
+												<div class="feature-shade" />
+											</div>
+											<div class="feature-copy">
+												<span class="pill">
+													<Icon name="moon" size={12} />
+													{i === 0 ? '最新' : '回顾'}
 												</span>
-											) : (
-												<span class="thumb empty" />
-											)}
-											<span class="copy">
-												<span class="title">{post.data.title}</span>
-												<span class="recent-meta">
-													<span class="date">
-														<FormattedDate date={post.data.pubDate} />
-													</span>
-													<span class="meta-sep" aria-hidden="true">·</span>
-													<CategoryChip
-														name={post.data.category}
-														variant="inline"
-														link={false}
-													/>
+												<h2>{post.data.title}</h2>
+												<p>{post.data.description}</p>
+												<span class="when">
+													<FormattedDate date={post.data.pubDate} />
+													<em aria-hidden="true">
+														阅读 <Icon name="arrow" size={14} />
+													</em>
 												</span>
-											</span>
+											</div>
 										</a>
-									</li>
+									</div>
 								))}
-							</ol>
+							</div>
+							<div class="feature-dots">
+								{slides.map((post, i) => (
+									<button
+										type="button"
+										class:list={['dot', i === 0 && 'is-active']}
+										aria-label={post.data.title}
+									>
+										<span class="dot-fill" style={`--interval:${FEATURE_INTERVAL_SEC}s`} />
+									</button>
+								))}
+							</div>
 						</div>
 					)
 				}
+				<div class="card">
+					<ArchiveHeatmap data={heatmapData} />
+				</div>
+			</div>
+		</section>
 
+		<section class="zone categories-zone" data-reveal style="--stagger:1">
+			<header class="zone-head">
+				<h2><Icon name="layers" size={18} /> 分类</h2>
+				<a class="zone-more" href="/categories">
+					全部 <Icon name="arrow" size={13} />
+				</a>
+			</header>
+			<ul class="category-cards">
 				{
-					tags.length > 0 && (
-						<div class="card panel tags-panel">
-							<header class="panel-head">
-								<h2>
-									<Icon name="tag" size={17} /> 文章标签
-								</h2>
-								<a href="/tags">
-									全部 <Icon name="arrow" size={13} />
-								</a>
-							</header>
-							<ul class="tag-cloud">
-								{tags.map((tag) => (
-									<li>
-										<a href={`/tags/${tag.slug}/`}>
-											{tag.name}
-											<span>{tag.count}</span>
-										</a>
-									</li>
-								))}
-							</ul>
-						</div>
-					)
+					categories.map((cat, i) => (
+						<li data-reveal style={`--stagger:${i}`}>
+							<a class={`category-card tone-${cat.tone}`} href={`/categories/${cat.name}/`}>
+								<span class="cat-icon" aria-hidden="true">
+									<Icon name={cat.icon} size={20} />
+								</span>
+								<span class="cat-copy">
+									<strong>{cat.name}</strong>
+									<span class="cat-desc">{cat.description}</span>
+								</span>
+								<span class="cat-count">{cat.count} 篇</span>
+							</a>
+						</li>
+					))
 				}
-			</section>
-		</main>
-		<Footer />
-		<script>
-			function startFeatureCarousel(): void {
-				const carousel = document.querySelector<HTMLElement>('.feature[data-interval]');
-				if (!carousel) return;
+			</ul>
+		</section>
 
-				const slides = [...carousel.querySelectorAll<HTMLElement>('.slide')];
-				const dots = [...carousel.querySelectorAll<HTMLButtonElement>('.dot')];
-				if (slides.length < 2) return;
+		<section class="bento bottom" data-reveal style="--stagger:2">
+			{
+				recent.length > 0 && (
+					<div class="card panel">
+						<header class="panel-head">
+							<h2>
+								<Icon name="blog" size={17} /> 最近更新
+							</h2>
+							<a href="/archives">
+								归档 <Icon name="arrow" size={13} />
+							</a>
+						</header>
+						<ol class="recent">
+							{recent.map((post) => (
+								<li>
+									<a href={`/blog/${post.id}/`}>
+										{post.data.heroImage ? (
+											<span class="thumb">
+												<Image src={post.data.heroImage} alt="" width={120} height={80} />
+											</span>
+										) : (
+											<span class="thumb empty" />
+										)}
+										<span class="copy">
+											<span class="title">{post.data.title}</span>
+											<span class="recent-meta">
+												<span class="date">
+													<FormattedDate date={post.data.pubDate} />
+												</span>
+												<span class="meta-sep" aria-hidden="true">·</span>
+												<CategoryChip
+													name={post.data.category}
+													variant="inline"
+													link={false}
+												/>
+											</span>
+										</span>
+									</a>
+								</li>
+							))}
+						</ol>
+					</div>
+				)
+			}
 
-				const interval = (Number(carousel.dataset.interval) || 7) * 1000;
-				let index = 0;
-				let timer: number | undefined;
+			{
+				tags.length > 0 && (
+					<div class="card panel tags-panel">
+						<header class="panel-head">
+							<h2>
+								<Icon name="tag" size={17} /> 文章标签
+							</h2>
+							<a href="/tags">
+								全部 <Icon name="arrow" size={13} />
+							</a>
+						</header>
+						<ul class="tag-cloud">
+							{tags.map((tag) => (
+								<li>
+									<a href={`/tags/${tag.slug}/`}>
+										{tag.name}
+										<span>{tag.count}</span>
+									</a>
+								</li>
+							))}
+						</ul>
+					</div>
+				)
+			}
+		</section>
+	</main>
+	<script>
+		function startFeatureCarousel(): void {
+			const carousel = document.querySelector<HTMLElement>('.feature[data-interval]');
+			if (!carousel) return;
 
-				const show = (next: number) => {
-					if (next === index) return;
-					slides[index]?.classList.remove('is-active');
-					slides[index]?.setAttribute('inert', '');
-					slides[next]?.classList.remove('inert');
-					slides[next]?.classList.add('is-active');
-					dots[index]?.classList.remove('is-active');
-					dots[next]?.classList.add('is-active');
-					index = next;
-					// 重新播放入场动画，让新激活的圆点从 0 开始计时
-					dots.forEach((dot, i) => {
-						const fill = dot.querySelector<HTMLElement>('.dot-fill');
-						if (!fill) return;
-						fill.style.animation = 'none';
-						if (i === index) {
-							void fill.offsetWidth;
-							fill.style.animation = '';
-						}
-					});
-				};
+			const slides = [...carousel.querySelectorAll<HTMLElement>('.slide')];
+			const dots = [...carousel.querySelectorAll<HTMLButtonElement>('.dot')];
+			if (slides.length < 2) return;
 
-				// 悬停/聚焦暂停时，圆点计时与自动播放同步停住
-				const freezeDots = (paused: boolean) => {
-					const fill = dots[index]?.querySelector<HTMLElement>('.dot-fill');
+			const interval = (Number(carousel.dataset.interval) || 7) * 1000;
+			let index = 0;
+			let timer: number | undefined;
+
+			const show = (next: number) => {
+				if (next === index) return;
+				slides[index]?.classList.remove('is-active');
+				slides[index]?.setAttribute('inert', '');
+				slides[next]?.classList.remove('inert');
+				slides[next]?.classList.add('is-active');
+				dots[index]?.classList.remove('is-active');
+				dots[next]?.classList.add('is-active');
+				index = next;
+				// 重新播放入场动画，让新激活的圆点从 0 开始计时
+				dots.forEach((dot, i) => {
+					const fill = dot.querySelector<HTMLElement>('.dot-fill');
 					if (!fill) return;
-					fill.style.animationPlayState = paused ? 'paused' : 'running';
-				};
+					fill.style.animation = 'none';
+					if (i === index) {
+						void fill.offsetWidth;
+						fill.style.animation = '';
+					}
+				});
+			};
 
-				const startTimer = () => {
-					if (timer === undefined) timer = window.setInterval(() => show((index + 1) % slides.length), interval);
-				};
-				const stopTimer = () => {
-					window.clearInterval(timer);
-					timer = undefined;
-				};
+			// 悬停/聚焦暂停时，圆点计时与自动播放同步停住
+			const freezeDots = (paused: boolean) => {
+				const fill = dots[index]?.querySelector<HTMLElement>('.dot-fill');
+				if (!fill) return;
+				fill.style.animationPlayState = paused ? 'paused' : 'running';
+			};
 
-				if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+			const startTimer = () => {
+				if (timer === undefined) timer = window.setInterval(() => show((index + 1) % slides.length), interval);
+			};
+			const stopTimer = () => {
+				window.clearInterval(timer);
+				timer = undefined;
+			};
+
+			if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+				startTimer();
+				carousel.addEventListener('mouseenter', () => {
+					stopTimer();
+					freezeDots(true);
+				});
+				carousel.addEventListener('mouseleave', () => {
 					startTimer();
-					carousel.addEventListener('mouseenter', () => {
-						stopTimer();
-						freezeDots(true);
-					});
-					carousel.addEventListener('mouseleave', () => {
-						startTimer();
-						freezeDots(false);
-					});
-					carousel.addEventListener('focusin', () => {
-						stopTimer();
-						freezeDots(true);
-					});
-					carousel.addEventListener('focusout', () => {
-						startTimer();
-						freezeDots(false);
-					});
-				}
-
-				dots.forEach((dot, i) => dot.addEventListener('click', () => show(i)));
+					freezeDots(false);
+				});
+				carousel.addEventListener('focusin', () => {
+					stopTimer();
+					freezeDots(true);
+				});
+				carousel.addEventListener('focusout', () => {
+					startTimer();
+					freezeDots(false);
+				});
 			}
 
-			document.addEventListener('astro:page-load', startFeatureCarousel);
-			if (document.readyState === 'loading') {
-				document.addEventListener('DOMContentLoaded', startFeatureCarousel, { once: true });
-			} else {
-				startFeatureCarousel();
-			}
-		</script>
-	</body>
-</html>
+			dots.forEach((dot, i) => dot.addEventListener('click', () => show(i)));
+		}
+
+		document.addEventListener('astro:page-load', startFeatureCarousel);
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', startFeatureCarousel, { once: true });
+		} else {
+			startFeatureCarousel();
+		}
+	</script>
+</PageLayout>
 
 <style>
 	.home {

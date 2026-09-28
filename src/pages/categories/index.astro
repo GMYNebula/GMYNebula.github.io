@@ -1,45 +1,16 @@
 ---
-import BaseHead from '../../components/BaseHead.astro';
+import ArchiveTabs from '../../components/ArchiveTabs.astro';
 import CategoryFolders from '../../components/CategoryFolders.astro';
-import Footer from '../../components/Footer.astro';
-import Header from '../../components/Header.astro';
+import PageHeader from '../../components/PageHeader.astro';
 import { SITE_TITLE } from '../../consts';
+import PageLayout from '../../layouts/PageLayout.astro';
 import { getAllCategories } from '../../utils/categories';
 
 const items = await getAllCategories();
 ---
 
-<!doctype html>
-<html lang="zh-CN">
-	<head>
-		<BaseHead title={`分类 · ${SITE_TITLE}`} description="技术、笔记与日常" />
-	</head>
-	<body>
-		<Header />
-		<main class="page categories-page">
-			<header class="mast">
-				<h1>分类</h1>
-			</header>
-			<CategoryFolders items={items} />
-		</main>
-		<Footer />
-	</body>
-</html>
-
-<style>
-	.categories-page {
-		width: min(640px, calc(100% - 2.5rem));
-		margin: 0 auto;
-		padding-top: 2.5rem;
-		padding-bottom: 4.5rem;
-	}
-
-	.mast {
-		margin-bottom: 1.15rem;
-		text-align: left;
-	}
-
-	.mast h1 {
-		margin: 0;
-	}
-</style>
+<PageLayout title={`分类 · ${SITE_TITLE}`} description="技术、笔记与日常" width="narrow">
+	<ArchiveTabs current="/categories" />
+	<PageHeader title="分类" />
+	<CategoryFolders items={items} />
+</PageLayout>

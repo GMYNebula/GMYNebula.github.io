@@ -1,19 +1,24 @@
 ---
 import { SITE_AUTHOR, SITE_TAGLINE, SITE_TITLE } from '../consts';
+import Icon from './Icon.astro';
 
 const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
 	<div class="inner">
-		<p class="line">{SITE_TITLE} · {SITE_TAGLINE}</p>
-		<p class="line muted">
-			© {year} {SITE_AUTHOR} ·
-			<a href="/rss.xml">RSS</a> ·
-			<a href="/archives/">归档</a> ·
-			<a href="/friends/">友链</a>
+		<p class="brand">
+			<Icon name="paw" size={15} />
+			<span class="title">{SITE_TITLE}</span>
+			<span class="tagline">{SITE_TAGLINE}</span>
 		</p>
-		<p class="line muted">
+		<nav class="links" aria-label="页脚">
+			<a href="/rss.xml"><Icon name="rss" size={13} />RSS</a>
+			<a href="/archives/"><Icon name="archive" size={13} />归档</a>
+			<a href="/friends/"><Icon name="friends" size={13} />友链</a>
+		</nav>
+		<p class="meta">
+			<span>© {year} {SITE_AUTHOR}</span>
 			<a href="https://icp.gov.moe/?keyword=20260274" target="_blank" rel="noopener noreferrer">萌ICP备20260274号</a>
 		</p>
 	</div>
@@ -21,43 +26,100 @@ const year = new Date().getFullYear();
 
 <style>
 	.site-footer {
-		margin-top: 2rem;
-		border-top: 1px solid var(--line);
-		background: var(--footer-bg);
-		backdrop-filter: blur(16px);
-		-webkit-backdrop-filter: blur(16px);
+		margin-top: auto;
+		padding: 1.5rem 0 1rem;
 	}
 
 	.inner {
 		width: min(1080px, calc(100% - 2.5rem));
 		margin: 0 auto;
-		padding: 1.75rem 0 2.25rem;
-		text-align: center;
-	}
-
-	.line {
-		margin: 0;
-		font-size: 0.92rem;
-		line-height: 1.75;
-		color: var(--ink-soft);
-	}
-
-	.line + .line {
-		margin-top: 0.15rem;
-	}
-
-	.muted {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.4rem 1.25rem;
+		padding: 0.55rem 1.1rem;
+		border: 1px solid var(--line);
+		border-radius: 999px;
+		background: var(--header-bg);
+		backdrop-filter: blur(18px) saturate(1.2);
+		-webkit-backdrop-filter: blur(18px) saturate(1.2);
+		box-shadow:
+			0 8px 22px color-mix(in srgb, var(--ink) 7%, transparent),
+			0 1px 0 color-mix(in srgb, #fff 20%, transparent) inset;
+		font-size: 0.82rem;
 		color: var(--muted);
-		font-size: 0.88rem;
 	}
 
-	a {
-		color: var(--ink-soft);
-		text-decoration: none;
-		font-weight: 600;
+	p {
+		margin: 0;
 	}
 
-	a:hover {
+	.brand {
+		display: flex;
+		align-items: center;
+		gap: 0.45rem;
 		color: var(--accent);
+	}
+
+	.title {
+		font-family: var(--font-display-stack);
+		font-size: 0.92rem;
+		font-weight: 700;
+		color: var(--ink);
+	}
+
+	.tagline {
+		color: var(--muted);
+	}
+
+	.links {
+		display: flex;
+		gap: 0.1rem;
+	}
+
+	.links a {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.28rem;
+		padding: 0.22rem 0.55rem;
+		border-radius: 999px;
+		font-weight: 500;
+		color: var(--muted);
+		text-decoration: none;
+		transition:
+			background 0.15s ease,
+			color 0.15s ease;
+	}
+
+	.links a:hover {
+		background: var(--accent-glow);
+		color: var(--accent-deep);
+	}
+
+	.meta {
+		display: flex;
+		gap: 0.8rem;
+	}
+
+	.meta a {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.meta a:hover {
+		color: var(--accent);
+	}
+
+	@media (max-width: 860px) {
+		.inner {
+			justify-content: center;
+			border-radius: 1.15rem;
+			text-align: center;
+		}
+
+		.tagline {
+			display: none;
+		}
 	}
 </style>

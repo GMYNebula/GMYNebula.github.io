@@ -1,11 +1,8 @@
 ---
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
-import BaseHead from '../components/BaseHead.astro';
 import Comments from '../components/Comments.astro';
-import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
-import Header from '../components/Header.astro';
 import Icon from '../components/Icon.astro';
 import PostLicense from '../components/PostLicense.astro';
 import PostNav from '../components/PostNav.astro';
@@ -15,6 +12,7 @@ import { getCategoryMeta } from '../data/categories';
 import { categoryToSlug, topicTags } from '../utils/categories';
 import { tagToSlug } from '../utils/tags';
 import { formatWordCount } from '../utils/word-count';
+import PageLayout from './PageLayout.astro';
 
 interface NavItem {
 	title: string;
@@ -49,115 +47,107 @@ const categoryMeta = getCategoryMeta(category);
 const displayTags = categoryMeta ? topicTags(tags, categoryMeta.name) : tags;
 ---
 
-<html lang="zh-CN">
-	<head>
-		<BaseHead title={title} description={description} image={heroImage} />
-	</head>
+<PageLayout title={title} description={description} image={heroImage}>
+	<ReadingProgress />
+	<main>
+		<article data-pagefind-body>
+			<div class="post-stage">
+				<div class:list={['shell', hasToc && 'has-toc']}>
+					<div class="layout">
+						<div class="main-col">
+							<article class:list={['article-card', 'surface', 'prose', heroImage && 'has-hero']}>
+								{
+									heroImage && (
+										<div class="hero-image">
+											<Image
+												width={1400}
+												height={700}
+												src={heroImage}
+												alt=""
+												loading="eager"
+												fetchpriority="high"
+											/>
+										</div>
+									)
+								}
+								<div class="article-inner">
+									<header class="title">
+										<h1>{title}</h1>
+										<div class="title-meta">
+											<span class="post-chip">
+												<Icon name="calendar" size={13} />
+												<FormattedDate date={pubDate} mode="datetime" />
+											</span>
+											{
+												wordCount > 0 && (
+													<span class="post-chip">
+														<Icon name="file-text" size={13} />
+														<span>{formatWordCount(wordCount)}</span>
+													</span>
+												)
+											}
+											{
+												categoryMeta && (
+													<a
+														class="post-chip post-chip--category"
+														href={`/categories/${categoryToSlug(categoryMeta.name)}/`}
+													>
+														<Icon name={categoryMeta.icon} size={13} />
+														<span>{categoryMeta.name}</span>
+													</a>
+												)
+											}
+											{
+												displayTags.map((tag) => (
+													<a class="post-chip" href={`/tags/${tagToSlug(tag)}/`}>
+														<Icon name="tag" size={13} />
+														<span>{tag}</span>
+													</a>
+												))
+											}
+											{
+												updatedDate && (
+													<span class="post-chip post-chip--muted">
+														更新 <FormattedDate date={updatedDate} mode="datetime" />
+													</span>
+												)
+											}
+										</div>
+										{description && <p class="dek">{description}</p>}
+									</header>
 
-	<body>
-		<ReadingProgress />
-		<Header />
-		<main>
-			<article data-pagefind-body>
-				<div class="post-stage">
-					<div class:list={['shell', hasToc && 'has-toc']}>
-						<div class="layout">
-							<div class="main-col">
-								<article class:list={['article-card', 'glass', 'prose', heroImage && 'has-hero']}>
-									{
-										heroImage && (
-											<div class="hero-image">
-												<Image
-													width={1400}
-													height={700}
-													src={heroImage}
-													alt=""
-													loading="eager"
-													fetchpriority="high"
-												/>
-											</div>
-										)
-									}
-									<div class="article-inner">
-										<header class="title">
-											<h1>{title}</h1>
-											<div class="title-meta">
-												<span class="post-chip">
-													<Icon name="calendar" size={13} />
-													<FormattedDate date={pubDate} mode="datetime" />
-												</span>
-												{
-													wordCount > 0 && (
-														<span class="post-chip">
-															<Icon name="file-text" size={13} />
-															<span>{formatWordCount(wordCount)}</span>
-														</span>
-													)
-												}
-												{
-													categoryMeta && (
-														<a
-															class="post-chip post-chip--category"
-															href={`/categories/${categoryToSlug(categoryMeta.name)}/`}
-														>
-															<Icon name={categoryMeta.icon} size={13} />
-															<span>{categoryMeta.name}</span>
-														</a>
-													)
-												}
-												{
-													displayTags.map((tag) => (
-														<a class="post-chip" href={`/tags/${tagToSlug(tag)}/`}>
-															<Icon name="tag" size={13} />
-															<span>{tag}</span>
-														</a>
-													))
-												}
-												{
-													updatedDate && (
-														<span class="post-chip post-chip--muted">
-															更新 <FormattedDate date={updatedDate} mode="datetime" />
-														</span>
-													)
-												}
-											</div>
-											{description && <p class="dek">{description}</p>}
-										</header>
+									<section class="content">
+										<slot />
+									</section>
 
-										<section class="content">
-											<slot />
-										</section>
+									{license && <PostLicense title={title} pubDate={pubDate} />}
+								</div>
+							</article>
 
-										{license && <PostLicense title={title} pubDate={pubDate} />}
-									</div>
-								</article>
+							<PostNav prev={prev} next={next} />
 
-								<PostNav prev={prev} next={next} />
-
-								<section class="comments-zone" data-pagefind-ignore>
-									<Comments />
-								</section>
-							</div>
-
-							{
-								hasToc && (
-									<div class="toc-col">
-										<TableOfContents headings={headings} />
-									</div>
-								)
-							}
+							<section class="comments-zone" data-pagefind-ignore>
+								<Comments />
+							</section>
 						</div>
+
+						{
+							hasToc && (
+								<div class="toc-col">
+									<TableOfContents headings={headings} />
+								</div>
+							)
+						}
 					</div>
 				</div>
-			</article>
-		</main>
-		<Footer />
-		<script>
-			import { bootArticleEnhancements } from '../scripts/article-enhancements.ts';
-			bootArticleEnhancements();
-		</script>
-	</body>
-</html>
+			</div>
+		</article>
+	</main>
+	<script>
+		import { bootArticleEnhancements } from '../scripts/article-enhancements.ts';
+		bootArticleEnhancements();
+	</script>
+</PageLayout>
 
 <style>
 	main {
@@ -168,7 +158,8 @@ const displayTags = categoryMeta ? topicTags(tags, categoryMeta.name) : tags;
 		width: min(var(--article-shell), calc(100% - 2.5rem));
 		margin: 0 auto;
 		padding: 2rem 0 3.5rem;
-		animation: fade-in 0.7s ease 0.08s both;
+		/* 不用 both：动画结束后若仍保留 opacity，.shell 会成为 backdrop root，目录、评论等玻璃块就模糊不到身后的猫爪层 */
+		animation: fade-in 0.7s ease 0.08s backwards;
 	}
 
 	.layout {

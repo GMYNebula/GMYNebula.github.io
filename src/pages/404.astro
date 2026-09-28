@@ -1,36 +1,24 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
 import Icon from '../components/Icon.astro';
 import { SITE_TITLE } from '../consts';
+import PageLayout from '../layouts/PageLayout.astro';
 ---
 
-<!doctype html>
-<html lang="zh-CN">
-	<head>
-		<BaseHead title={`迷路了 · ${SITE_TITLE}`} description="404" />
-	</head>
-	<body>
-		<Header />
-		<main class="page narrow">
-			<p class="code">404</p>
-			<h1>喵？这里什么都没有</h1>
-			<p class="hint">也许链接写错了，或者页面搬家了 (；′⌒`)</p>
-			<p class="actions">
-				<a href="/"><Icon name="home" size={15} />回小窝</a>
-				<a href="/archives"><Icon name="archive" size={15} />去归档</a>
-			</p>
-		</main>
-		<Footer />
-	</body>
-</html>
+<PageLayout title={`迷路了 · ${SITE_TITLE}`} description="404" width="medium">
+	<div class="not-found">
+		<p class="code">404</p>
+		<h1>喵？这里什么都没有</h1>
+		<p class="hint">也许链接写错了，或者页面搬家了 (；′⌒`)</p>
+		<p class="actions">
+			<a href="/"><Icon name="home" size={15} />回小窝</a>
+			<a href="/archives"><Icon name="archive" size={15} />去归档</a>
+		</p>
+	</div>
+</PageLayout>
 
 <style>
-	.narrow {
-		width: min(760px, calc(100% - 2.5rem));
-		padding-top: 4rem;
-		padding-bottom: 5rem;
+	.not-found {
+		padding: 1.5rem 0 1rem;
 	}
 
 	.code {

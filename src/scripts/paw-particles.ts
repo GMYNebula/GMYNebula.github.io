@@ -4,7 +4,7 @@ import { loadImageShape } from '@tsparticles/shape-image';
 
 const CONTAINER_ID = 'nicocat-paws';
 /** 调参后递增，避免复用旧容器 */
-const EFFECT_REV = 9;
+const EFFECT_REV = 10;
 
 type PawGlobals = {
 	bound?: boolean;
@@ -37,7 +37,8 @@ function buildOptions(): ISourceOptions {
 	return {
 		fullScreen: {
 			enable: true,
-			zIndex: 0,
+			// 与 .site-bg 同为 -1，靠 DOM 顺序叠在背景上、正文框下
+			zIndex: -1,
 		},
 		fpsLimit: 30,
 		detectRetina: true,

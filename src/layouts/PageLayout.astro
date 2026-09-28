@@ -1,0 +1,37 @@
+---
+import type { ImageMetadata } from 'astro';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+
+interface Props {
+	title: string;
+	description: string;
+	image?: ImageMetadata;
+	/** 不传时页面自己写 <main>（首页、文章页等整页自定义布局） */
+	width?: 'narrow' | 'medium' | 'wide';
+}
+
+const { title, description, image, width } = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={title} description={description} image={image} />
+		<slot name="head" />
+	</head>
+	<body>
+		<Header />
+		{
+			width ? (
+				<main class:list={['page', `page--${width}`]}>
+					<slot />
+				</main>
+			) : (
+				<slot />
+			)
+		}
+		<Footer />
+	</body>
+</html>

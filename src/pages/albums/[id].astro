@@ -1,0 +1,100 @@
+---
+import { render } from 'astro:content';
+import FormattedDate from '../../components/FormattedDate.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import { SITE_TITLE } from '../../consts';
+import PageLayout from '../../layouts/PageLayout.astro';
+import { getPublishedAlbums } from '../../utils/albums';
+
+export async function getStaticPaths() {
+	const albums = await getPublishedAlbums();
+	return albums.map((album) => ({ params: { id: album.id }, props: { album } }));
+}
+
+const { album } = Astro.props;
+const { title, date, location, description, photos } = album.data;
+const { Content } = await render(album);
+---
+
+<PageLayout title={`${title} · 相册 · ${SITE_TITLE}`} description={description ?? title} width="wide">
+	<PageHeader title={title} eyebrow="Album" icon="image" lede={description}>
+		<a slot="before" class="back" href="/albums">← 全部相册</a>
+		<p class="meta">
+			<FormattedDate date={date} />
+			{location && <span>{location}</span>}
+			<span>{photos.length} 张</span>
+		</p>
+	</PageHeader>
+
+	{
+		album.body?.trim() && (
+			<div class="prose intro">
+				<Content />
+			</div>
+		)
+	}
+
+	<div class="album-photos">
+		{
+			photos.map((photo) => (
+				<figure>
+					<img src={photo.src} alt={photo.caption ?? ''} loading="lazy" decoding="async" />
+					{photo.caption && <figcaption>{photo.caption}</figcaption>}
+				</figure>
+			))
+		}
+	</div>
+</PageLayout>
+
+<style>
+	.back {
+		display: block;
+		width: fit-content;
+		margin-bottom: 1rem;
+		font-size: 0.9rem;
+		font-weight: 700;
+		color: var(--muted);
+		text-decoration: none;
+	}
+
+	.back:hover {
+		color: var(--accent);
+	}
+
+	.meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.2rem 0.9rem;
+		margin: 0;
+		font-size: 0.85rem;
+		color: var(--muted);
+	}
+
+	.intro {
+		margin-bottom: 1.5rem;
+	}
+
+	.album-photos {
+		columns: 3 15rem;
+		column-gap: 0.7rem;
+	}
+
+	figure {
+		margin: 0 0 0.7rem;
+		break-inside: avoid;
+		animation: rise 0.55s ease backwards;
+	}
+
+	img {
+		width: 100%;
+		border-radius: 0.7rem;
+		border: 1px solid var(--line);
+	}
+
+	figcaption {
+		margin-top: 0.35rem;
+		font-size: 0.8rem;
+		color: var(--muted);
+		text-align: center;
+	}
+</style>

@@ -1,0 +1,366 @@
+---
+import Icon from '../../components/Icon.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import { SITE_TITLE } from '../../consts';
+import PageLayout from '../../layouts/PageLayout.astro';
+import { getBookmarkGroups } from '../../utils/bookmarks';
+
+const groups = await getBookmarkGroups();
+
+function formatDuration(seconds: number) {
+	const m = Math.floor(seconds / 60);
+	const s = String(seconds % 60).padStart(2, '0');
+	return m >= 60 ? `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}:${s}` : `${m}:${s}`;
+}
+---
+
+<PageLayout title={`收藏 · ${SITE_TITLE}`} description="看过觉得好的东西" width="wide">
+	<PageHeader title="收藏" eyebrow="Bookmarks" icon="heart" lede="看过觉得好的东西" />
+	{
+		groups.length === 0 ? (
+			<p class="empty">还没有收藏喵～</p>
+		) : (
+			<>
+				<nav class="jump-bar" aria-label="快速跳转">
+					<div class="jump-links">
+						{groups.map((group) => (
+							<a href={`#group-${group.id}`}>
+								{group.name}
+								<span>{group.items.length}</span>
+							</a>
+						))}
+					</div>
+					<div class="jump-ends">
+						<button type="button" data-jump="top" aria-label="跳到顶部">
+							<Icon name="chevron-down" size={16} class="up" />
+						</button>
+						<button type="button" data-jump="bottom" aria-label="跳到底部">
+							<Icon name="chevron-down" size={16} />
+						</button>
+					</div>
+				</nav>
+				{groups.map((group) => (
+					<details class="group" id={`group-${group.id}`} open>
+						<summary>
+							<h2>
+								<Icon name="chevron-down" size={18} class="chevron" />
+								{group.name}
+								<span>{group.items.length}</span>
+							</h2>
+						</summary>
+						<ul class="grid">
+							{group.items.map((item) => (
+								<li>
+									<a class="bookmark surface" href={item.url} target="_blank" rel="noopener noreferrer">
+										{item.image && (
+											<div class="cover">
+												<img
+													src={item.image}
+													alt=""
+													loading="lazy"
+													decoding="async"
+													referrerpolicy="no-referrer"
+													onerror="this.parentElement.classList.add('broken')"
+												/>
+												{item.duration !== undefined && (
+													<span class="duration">{formatDuration(item.duration)}</span>
+												)}
+											</div>
+										)}
+										<div class="info">
+											<h3>{item.title}</h3>
+											{item.description && <p class="desc">{item.description}</p>}
+											{item.note && <p class="note">{item.note}</p>}
+											<p class="source">
+												{item.icon && (
+													<img
+														class="favicon"
+														src={item.icon}
+														alt=""
+														width="14"
+														height="14"
+														referrerpolicy="no-referrer"
+														onerror="this.remove()"
+													/>
+												)}
+												{item.source}
+											</p>
+										</div>
+									</a>
+								</li>
+							))}
+						</ul>
+					</details>
+				))}
+			</>
+		)
+	}
+</PageLayout>
+
+<script>
+	document.addEventListener('click', (e) => {
+		const target = e.target as Element;
+		const link = target.closest<HTMLAnchorElement>('.jump-bar a');
+		if (link) {
+			// 跳到已收起的分组时先展开
+			document.getElementById(decodeURIComponent(link.hash.slice(1)))?.setAttribute('open', '');
+			return;
+		}
+		const jump = target.closest<HTMLElement>('.jump-bar [data-jump]')?.dataset.jump;
+		if (jump) {
+			window.scrollTo({ top: jump === 'top' ? 0 : document.documentElement.scrollHeight, behavior: 'smooth' });
+		}
+	});
+
+	// 滑过页头后才显示
+	window.addEventListener(
+		'scroll',
+		() => document.querySelector('.jump-bar')?.classList.toggle('show', window.scrollY > 160),
+		{ passive: true },
+	);
+</script>
+
+<style>
+	.empty {
+		color: var(--muted);
+	}
+
+	/* 放得下时贴在内容右侧（页宽 920 的一半 + 间距），放不下时贴视口右边、浮在卡片上；--scroll-offset 是页头高度 + 12px */
+	.jump-bar {
+		position: fixed;
+		top: var(--scroll-offset);
+		left: min(calc(50% + 460px + var(--toc-gap)), calc(100% - 11rem - 1.25rem));
+		z-index: 10;
+		display: flex;
+		flex-direction: column;
+		gap: 0.3rem;
+		width: 11rem;
+		padding: 0.3rem;
+		border: 1px solid var(--line);
+		border-radius: 0.75rem;
+		background: color-mix(in srgb, var(--surface) 82%, transparent);
+		backdrop-filter: blur(14px) saturate(1.2);
+		-webkit-backdrop-filter: blur(14px) saturate(1.2);
+		box-shadow: var(--shadow-panel);
+		opacity: 0;
+		visibility: hidden;
+		transform: translateX(1rem);
+		transition:
+			opacity 0.2s ease,
+			transform 0.2s ease,
+			visibility 0.2s;
+	}
+
+	.jump-bar.show {
+		opacity: 1;
+		visibility: visible;
+		transform: none;
+	}
+
+	.jump-links {
+		display: flex;
+		flex-direction: column;
+		gap: 0.2rem;
+	}
+
+	.jump-links a,
+	.jump-bar button {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		padding: 0.35rem 0.8rem;
+		border: none;
+		border-radius: 999px;
+		background: transparent;
+		color: var(--muted);
+		font: inherit;
+		font-size: 0.86rem;
+		font-weight: 600;
+		text-decoration: none;
+		white-space: nowrap;
+		cursor: pointer;
+		transition:
+			background 0.15s ease,
+			color 0.15s ease;
+	}
+
+	.jump-links a {
+		justify-content: space-between;
+	}
+
+	.jump-links a span {
+		font-size: 0.75rem;
+		opacity: 0.75;
+	}
+
+	.jump-bar button {
+		padding: 0.35rem 0.5rem;
+	}
+
+	.jump-links a:hover,
+	.jump-bar button:hover {
+		background: var(--accent-glow);
+		color: var(--accent-deep);
+	}
+
+	.jump-bar :global(.up) {
+		transform: rotate(180deg);
+	}
+
+	.jump-ends {
+		display: flex;
+		justify-content: center;
+		gap: 0.2rem;
+		padding-top: 0.3rem;
+		border-top: 1px dashed var(--line);
+	}
+
+	.group + .group {
+		margin-top: 1.5rem;
+	}
+
+	summary {
+		width: fit-content;
+		list-style: none;
+		cursor: pointer;
+	}
+
+	summary::-webkit-details-marker {
+		display: none;
+	}
+
+	h2 {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin: 0;
+		font-size: 1.3rem;
+	}
+
+	summary:hover h2 {
+		color: var(--accent);
+	}
+
+	h2 :global(.chevron) {
+		color: var(--muted);
+		transition: transform 0.2s ease;
+	}
+
+	.group:not([open]) h2 :global(.chevron) {
+		transform: rotate(-90deg);
+	}
+
+	h2 span {
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--muted);
+	}
+
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+		gap: 1rem;
+		margin: 0.9rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.bookmark {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		overflow: hidden;
+		color: inherit;
+		text-decoration: none;
+		animation: rise 0.55s ease backwards;
+		transition:
+			transform 0.2s ease,
+			border-color 0.2s ease;
+	}
+
+	.bookmark:hover {
+		transform: translateY(-3px);
+		border-color: var(--accent);
+	}
+
+	/* 底色兼作原站删图后的占位 */
+	.cover {
+		position: relative;
+		aspect-ratio: 16 / 9;
+		background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+	}
+
+	.cover img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.cover.broken img {
+		visibility: hidden;
+	}
+
+	.duration {
+		position: absolute;
+		right: 0.5rem;
+		bottom: 0.5rem;
+		padding: 0.05rem 0.4rem;
+		border-radius: 0.3rem;
+		background: rgba(0, 0, 0, 0.65);
+		color: #fff;
+		font-size: 0.75rem;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.info {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		gap: 0.4rem;
+		padding: 0.8rem 1rem 0.9rem;
+	}
+
+	h3,
+	.desc {
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		overflow: hidden;
+		margin: 0;
+	}
+
+	h3 {
+		font-size: 1rem;
+		line-height: 1.45;
+	}
+
+	.desc {
+		font-size: 0.84rem;
+		line-height: 1.55;
+		color: var(--muted);
+	}
+
+	.note {
+		margin: 0;
+		padding-left: 0.6rem;
+		border-left: 2px solid var(--accent);
+		font-size: 0.84rem;
+		color: var(--ink-soft);
+	}
+
+	.source {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+		margin: auto 0 0;
+		padding-top: 0.2rem;
+		font-size: 0.78rem;
+		color: var(--muted);
+	}
+
+	.favicon {
+		width: 14px;
+		height: 14px;
+		border-radius: 3px;
+	}
+</style>

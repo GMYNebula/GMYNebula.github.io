@@ -1,9 +1,8 @@
 ---
-import BaseHead from '../../components/BaseHead.astro';
-import Footer from '../../components/Footer.astro';
-import Header from '../../components/Header.astro';
-import Icon from '../../components/Icon.astro';
+import ArchiveTabs from '../../components/ArchiveTabs.astro';
+import PageHeader from '../../components/PageHeader.astro';
 import { SITE_TITLE } from '../../consts';
+import PageLayout from '../../layouts/PageLayout.astro';
 import { getAllTags } from '../../utils/tags';
 
 const allTags = await getAllTags();
@@ -46,78 +45,36 @@ const tagItems = tags.map((tag, i) => {
 });
 ---
 
-<!doctype html>
-<html lang="zh-CN">
-	<head>
-		<BaseHead title={`标签 · ${SITE_TITLE}`} description="话题词云" />
-	</head>
-	<body>
-		<Header />
-		<main class="page tags-page">
-			<header class="mast">
-				<p class="eyebrow"><Icon name="tag" size={14} /> Tags</p>
-				<h1>标签</h1>
-			</header>
+<PageLayout title={`标签 · ${SITE_TITLE}`} description="话题词云" width="wide">
+	<ArchiveTabs current="/tags" />
+	<PageHeader title="标签" eyebrow="Tags" icon="tag" align="center" size="large" />
 
-			{
-				tagItems.length === 0 ? (
-					<p class="empty">还没有标签喵～</p>
-				) : (
-					<div class="wordcloud" data-gravity aria-label="标签">
-						{tagItems.map((tag) => (
-							<a
-								class={`word tone-${tag.tone}`}
-								href={`/tags/${tag.slug}/`}
-								draggable="false"
-								style={`--s:${tag.size.toFixed(2)}rem; --r:${tag.rot}deg; --i:${tag.i};`}
-								title={`${tag.name} · ${tag.count}`}
-							>
-								{tag.name}
-								<sup>{tag.count}</sup>
-							</a>
-						))}
-					</div>
-				)
-			}
-		</main>
-		<Footer />
-		<script>
-			import '../../scripts/tag-gravity.ts';
-		</script>
-	</body>
-</html>
+	{
+		tagItems.length === 0 ? (
+			<p class="empty">还没有标签喵～</p>
+		) : (
+			<div class="wordcloud" data-gravity aria-label="标签">
+				{tagItems.map((tag) => (
+					<a
+						class={`word tone-${tag.tone}`}
+						href={`/tags/${tag.slug}/`}
+						draggable="false"
+						style={`--s:${tag.size.toFixed(2)}rem; --r:${tag.rot}deg; --i:${tag.i};`}
+						title={`${tag.name} · ${tag.count}`}
+					>
+						{tag.name}
+						<sup>{tag.count}</sup>
+					</a>
+				))}
+			</div>
+		)
+	}
+	<script>
+		import '../../scripts/tag-gravity.ts';
+	</script>
+</PageLayout>
 
 <style>
-	.tags-page {
-		width: min(920px, calc(100% - 2.5rem));
-		padding-top: 3rem;
-		padding-bottom: 4.5rem;
-	}
-
-	.mast {
-		margin-bottom: 1.5rem;
-		text-align: center;
-		animation: rise 0.55s ease both;
-	}
-
-	.eyebrow {
-		margin: 0 0 0.45rem;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.35rem;
-		font-size: 0.78rem;
-		font-weight: 700;
-		letter-spacing: 0.18em;
-		text-transform: uppercase;
-		color: var(--accent);
-	}
-
-	.mast h1 {
-		margin: 0;
-		font-size: clamp(2.4rem, 6vw, 3.4rem);
-	}
-
 	.empty {
 		color: var(--muted);
 		text-align: center;

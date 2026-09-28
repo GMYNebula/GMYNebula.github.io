@@ -15,12 +15,12 @@ html[data-theme='dark'] {
 	--line-strong: rgba(255, 255, 255, 0.16);
 	--glass: rgba(255, 255, 255, 0.055);
 	--glass-strong: rgba(255, 255, 255, 0.09);
+	--surface: #15191e;
 	--accent: #e8836b;
 	--accent-deep: #f0a48e;
 	--accent-glow: rgba(232, 131, 107, 0.22);
 	--teal: #7fc4b5;
 	--header-bg: rgba(14, 17, 20, 0.62);
-	--footer-bg: rgba(14, 17, 20, 0.55);
 	--code-bg: rgba(255, 255, 255, 0.08);
 	--pre-bg: #0a0c0e;
 	--scroll-thumb: rgba(255, 255, 255, 0.14);
@@ -55,12 +55,12 @@ html[data-theme='light'] {
 	--line-strong: rgba(18, 20, 23, 0.16);
 	--glass: rgba(255, 255, 255, 0.72);
 	--glass-strong: rgba(255, 255, 255, 0.9);
+	--surface: #fcfdfe;
 	--accent: #c44b2f;
 	--accent-deep: #9a3722;
 	--accent-glow: rgba(196, 75, 47, 0.14);
 	--teal: #2f8f7f;
 	--header-bg: rgba(251, 252, 253, 0.78);
-	--footer-bg: rgba(255, 255, 255, 0.7);
 	--code-bg: rgba(18, 20, 23, 0.06);
 	--pre-bg: #171a1e;
 	--scroll-thumb: rgba(18, 20, 23, 0.16);
@@ -88,7 +88,11 @@ html {
 	scroll-padding-top: var(--scroll-offset);
 }
 
+/* 纵向 flex 让页脚在短页面也贴底（Footer 用 margin-top: auto） */
 body {
+	display: flex;
+	flex-direction: column;
+	min-height: 100dvh;
 	margin: 0;
 	padding: 0;
 	font-family: var(--font-body-stack);
@@ -156,10 +160,23 @@ p {
 	margin: 0 0 1em 0;
 }
 
+/* PageLayout 的三档页宽 */
 main.page {
-	width: min(1080px, calc(100% - 2.5rem));
+	width: min(var(--page-width), calc(100% - 2.5rem));
 	margin: 0 auto;
 	padding: 2.5rem 0 4rem;
+}
+
+main.page--narrow {
+	--page-width: 640px;
+}
+
+main.page--medium {
+	--page-width: 820px;
+}
+
+main.page--wide {
+	--page-width: 920px;
 }
 
 .glass {
@@ -168,6 +185,14 @@ main.page {
 	border-radius: 0.9rem;
 	backdrop-filter: blur(14px) saturate(1.2);
 	-webkit-backdrop-filter: blur(14px) saturate(1.2);
+	box-shadow: var(--shadow-panel);
+}
+
+/* 不透明面板：长文阅读区用，背景和猫爪层不透字 */
+.surface {
+	background: var(--surface);
+	border: 1px solid var(--line);
+	border-radius: 0.9rem;
 	box-shadow: var(--shadow-panel);
 }
 
@@ -839,6 +864,8 @@ pre:not(.expressive-code pre) {
 	padding: 1.25em;
 	overflow-x: auto;
 	background: var(--pre-bg);
+	/* --pre-bg 在两套主题下都是深色，字色不能跟随 --ink */
+	color: #e6e8eb;
 	border: 1px solid var(--line);
 	border-radius: 0.65rem;
 	font-family: var(--font-mono-stack);

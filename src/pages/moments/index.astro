@@ -1,0 +1,129 @@
+---
+import { render } from 'astro:content';
+import Icon from '../../components/Icon.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import { SITE_TITLE } from '../../consts';
+import PageLayout from '../../layouts/PageLayout.astro';
+import { getPublishedMoments } from '../../utils/moments';
+
+const moments = await getPublishedMoments();
+const items = await Promise.all(
+	moments.map(async (entry) => ({ entry, Content: (await render(entry)).Content })),
+);
+
+// 构建机在 UTC，显式指定时区才能显示成发布时的本地时间
+const timeFormat = new Intl.DateTimeFormat('zh-CN', {
+	timeZone: 'Asia/Shanghai',
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+	hour: '2-digit',
+	minute: '2-digit',
+	hour12: false,
+});
+
+function gridCols(count: number) {
+	if (count === 1) return 1;
+	return count === 2 || count === 4 ? 2 : 3;
+}
+---
+
+<PageLayout title={`动态 · ${SITE_TITLE}`} description="碎碎念和随手拍" width="medium">
+	<PageHeader title="动态" eyebrow="Moments" icon="message" lede="碎碎念和随手拍" />
+	{
+		items.length === 0 ? (
+			<p class="empty">还没有动态喵～</p>
+		) : (
+			<ol class="feed">
+				{items.map(({ entry, Content }) => (
+					<li class="moment surface">
+						<time datetime={entry.data.date.toISOString()}>
+							<Icon name="clock" size={13} />
+							{timeFormat.format(entry.data.date)}
+						</time>
+						<div class="prose body">
+							<Content />
+						</div>
+						{entry.data.images.length > 0 && (
+							<div class:list={['moment-images', `cols-${gridCols(entry.data.images.length)}`]}>
+								{entry.data.images.map((src) => (
+									<img src={src} alt="" loading="lazy" decoding="async" />
+								))}
+							</div>
+						)}
+					</li>
+				))}
+			</ol>
+		)
+	}
+</PageLayout>
+
+<style>
+	.empty {
+		color: var(--muted);
+	}
+
+	.feed {
+		display: grid;
+		gap: 1rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.moment {
+		padding: 1.1rem 1.35rem 1.2rem;
+		animation: rise 0.55s ease backwards;
+	}
+
+	time {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		font-size: 0.82rem;
+		color: var(--muted);
+	}
+
+	.body {
+		margin-top: 0.5rem;
+	}
+
+	.body :global(> :first-child) {
+		margin-top: 0;
+	}
+
+	.body :global(> :last-child) {
+		margin-bottom: 0;
+	}
+
+	.moment-images {
+		display: grid;
+		gap: 0.4rem;
+		max-width: 30rem;
+		margin-top: 0.85rem;
+	}
+
+	.moment-images img {
+		width: 100%;
+		aspect-ratio: 1;
+		object-fit: cover;
+		border-radius: 0.6rem;
+		border: 1px solid var(--line);
+	}
+
+	.cols-1 {
+		max-width: 20rem;
+	}
+
+	.cols-1 img {
+		aspect-ratio: auto;
+	}
+
+	.cols-2 {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.cols-3 {
+		grid-template-columns: repeat(3, 1fr);
+	}
+</style>

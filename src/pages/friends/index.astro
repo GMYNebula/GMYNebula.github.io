@@ -1,10 +1,8 @@
 ---
-import BaseHead from '../../components/BaseHead.astro';
 import Comments from '../../components/Comments.astro';
-import Footer from '../../components/Footer.astro';
-import Header from '../../components/Header.astro';
-import Icon from '../../components/Icon.astro';
+import PageHeader from '../../components/PageHeader.astro';
 import { SITE_TITLE } from '../../consts';
+import PageLayout from '../../layouts/PageLayout.astro';
 import { friends } from '../../data/friends';
 import { siteLinkCard } from '../../data/profile';
 
@@ -21,90 +19,51 @@ const siteTemplate = `- 网址: ${siteLinkCard.url}
 - RSS地址: ${siteLinkCard.url}/rss.xml`;
 ---
 
-<!doctype html>
-<html lang="zh-CN">
-	<head>
-		<BaseHead title={`友链 · ${SITE_TITLE}`} description="朋友们的小站" />
-	</head>
-	<body>
-		<Header />
-		<main class="page narrow">
-			<header class="mast">
-				<p class="eyebrow"><Icon name="friends" size={14} /> Friends</p>
-				<h1>友链</h1>
-				<p class="lede">在本页底部留言申请友链，按下面代码块的五项发我就好。</p>
-			</header>
+<PageLayout title={`友链 · ${SITE_TITLE}`} description="朋友们的小站" width="medium">
+	<PageHeader
+		title="友链"
+		eyebrow="Friends"
+		icon="friends"
+		lede="在本页底部留言申请友链，按下面代码块的五项发我就好。"
+	/>
 
-			<section class="apply glass" aria-label="友链申请格式">
-				<h2>申请时请发</h2>
-				<pre><code>{applyTemplate}</code></pre>
-			</section>
+	<section class="apply glass" aria-label="友链申请格式">
+		<h2>申请时请发</h2>
+		<pre><code>{applyTemplate}</code></pre>
+	</section>
 
-			<section class="apply glass" aria-label="本站信息">
-				<h2>本站信息（互换用）</h2>
-				<pre><code>{siteTemplate}</code></pre>
-			</section>
+	<section class="apply glass" aria-label="本站信息">
+		<h2>本站信息（互换用）</h2>
+		<pre><code>{siteTemplate}</code></pre>
+	</section>
 
-			{
-				friends.length > 0 ? (
-					<ul class="friends">
-						{friends.map((friend) => (
-							<li>
-								<a href={friend.url} target="_blank" rel="noopener noreferrer">
-									<span class="name">
-										<img class="avatar" src={friend.avatar} alt="" width="28" height="28" />
-										{friend.name}
-									</span>
-									<span class="desc">{friend.description}</span>
-									<span class="url">{friend.url}</span>
-								</a>
-							</li>
-						))}
-					</ul>
-				) : (
-					<p class="empty">友链列表还空着，欢迎来换链 ♪</p>
-				)
-			}
+	{
+		friends.length > 0 ? (
+			<ul class="friends">
+				{friends.map((friend) => (
+					<li>
+						<a href={friend.url} target="_blank" rel="noopener noreferrer">
+							<span class="name">
+								<img class="avatar" src={friend.avatar} alt="" width="28" height="28" />
+								{friend.name}
+							</span>
+							<span class="desc">{friend.description}</span>
+							<span class="url">{friend.url}</span>
+						</a>
+					</li>
+				))}
+			</ul>
+		) : (
+			<p class="empty">友链列表还空着，欢迎来换链 ♪</p>
+		)
+	}
 
-			<section class="comments-zone" aria-label="友链留言">
-				<Comments />
-			</section>
-		</main>
-		<Footer />
-	</body>
-</html>
+	<section class="comments-zone" aria-label="友链留言">
+		<Comments />
+	</section>
+</PageLayout>
 
 <style>
-	.narrow {
-		width: min(760px, calc(100% - 2.5rem));
-	}
-
-	.mast {
-		margin-bottom: 1.35rem;
-	}
-
-	.eyebrow {
-		margin: 0 0 0.45rem;
-		display: inline-flex;
-		align-items: center;
-		gap: 0.35rem;
-		font-size: 0.78rem;
-		font-weight: 700;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
-		color: var(--accent);
-	}
-
-	.mast h1 {
-		margin: 0;
-	}
-
-	.lede {
-		margin: 0.55rem 0 0;
-		color: var(--muted);
-		line-height: 1.6;
-	}
-
 	.apply {
 		margin-bottom: 1.35rem;
 		padding: 1rem 1.15rem;

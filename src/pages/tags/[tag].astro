@@ -1,10 +1,9 @@
 ---
-import BaseHead from '../../components/BaseHead.astro';
-import Footer from '../../components/Footer.astro';
-import Header from '../../components/Header.astro';
 import Icon from '../../components/Icon.astro';
+import PageHeader from '../../components/PageHeader.astro';
 import PostList from '../../components/PostList.astro';
 import { SITE_TITLE } from '../../consts';
+import PageLayout from '../../layouts/PageLayout.astro';
 import { getAllTags, slugToTag } from '../../utils/tags';
 
 export async function getStaticPaths() {
@@ -26,65 +25,39 @@ const { tagName, posts, siblings } = Astro.props;
 const displayTag = tagName ?? slugToTag(Astro.params.tag!);
 ---
 
-<!doctype html>
-<html lang="zh-CN">
-	<head>
-		<BaseHead
-			title={`${displayTag} · 标签 · ${SITE_TITLE}`}
-			description={`#${displayTag}`}
-		/>
-	</head>
-	<body>
-		<Header />
-		<main class="page narrow">
-			<header class="mast">
-				<a class="back" href="/tags">← 全部标签</a>
-				<p class="eyebrow"><Icon name="tag" size={14} /> Tag</p>
-				<h1>
-					<span class="hash">#</span>
-					{displayTag}
-				</h1>
-				<p class="meta">{posts.length} 篇</p>
-			</header>
+<PageLayout title={`${displayTag} · 标签 · ${SITE_TITLE}`} description={`#${displayTag}`} width="medium">
+	<PageHeader title={displayTag} eyebrow="Tag" icon="tag" lede={`${posts.length} 篇`} size="large">
+		<a slot="before" class="back" href="/tags">← 全部标签</a>
+		<Fragment slot="title"><span class="hash">#</span>{displayTag}</Fragment>
+	</PageHeader>
 
-			<PostList posts={posts} variant="card" />
+	<PostList posts={posts} variant="card" />
 
-			{
-				siblings?.length > 0 && (
-					<section class="more">
-						<h2>
-							<Icon name="sparkle" size={16} /> 其他话题
-						</h2>
-						<ul>
-							{siblings.map((t) => (
-								<li>
-									<a href={`/tags/${t.slug}/`}>
-										{t.name}
-										<span>{t.count}</span>
-									</a>
-								</li>
-							))}
-						</ul>
-					</section>
-				)
-			}
-		</main>
-		<Footer />
-	</body>
-</html>
+	{
+		siblings?.length > 0 && (
+			<section class="more">
+				<h2>
+					<Icon name="sparkle" size={16} /> 其他话题
+				</h2>
+				<ul>
+					{siblings.map((t) => (
+						<li>
+							<a href={`/tags/${t.slug}/`}>
+								{t.name}
+								<span>{t.count}</span>
+							</a>
+						</li>
+					))}
+				</ul>
+			</section>
+		)
+	}
+</PageLayout>
 
 <style>
-	.narrow {
-		width: min(820px, calc(100% - 2.5rem));
-	}
-
-	.mast {
-		margin-bottom: 2rem;
-		animation: rise 0.55s ease both;
-	}
-
 	.back {
-		display: inline-block;
+		display: block;
+		width: fit-content;
 		margin-bottom: 1rem;
 		font-size: 0.9rem;
 		font-weight: 700;
@@ -96,35 +69,10 @@ const displayTag = tagName ?? slugToTag(Astro.params.tag!);
 		color: var(--accent);
 	}
 
-	.eyebrow {
-		margin: 0 0 0.4rem;
-		display: inline-flex;
-		align-items: center;
-		gap: 0.35rem;
-		font-size: 0.78rem;
-		font-weight: 700;
-		letter-spacing: 0.18em;
-		text-transform: uppercase;
-		color: var(--accent);
-	}
-
-	.mast h1 {
-		margin: 0 0 0.45rem;
-		display: flex;
-		align-items: baseline;
-		gap: 0.2rem;
-		font-size: clamp(2.2rem, 5vw, 3rem);
-	}
-
 	.hash {
+		margin-right: 0.2rem;
 		color: var(--accent);
 		opacity: 0.85;
-	}
-
-	.meta {
-		margin: 0;
-		color: var(--muted);
-		font-weight: 600;
 	}
 
 	.more {

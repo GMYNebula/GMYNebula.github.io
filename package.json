@@ -10,6 +10,7 @@
     "dev:clean": "node scripts/clean-vite-cache.mjs && astro dev --force",
     "build": "astro build && npx --yes pagefind --site dist",
     "preview": "astro preview",
+    "bookmarks": "node scripts/fetch-bookmarks.mjs",
     "astro": "astro"
   },
   "dependencies": {
@@ -49,6 +50,7 @@
     "esbuild": true
   },
   "devDependencies": {
-    "@types/matter-js": "^0.20.2"
+    "@types/matter-js": "^0.20.2",
+    "js-yaml": "^4.3.2"
   }
 }

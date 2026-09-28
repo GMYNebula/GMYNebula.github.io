@@ -47,7 +47,7 @@ function openLightbox(img: HTMLImageElement): void {
 }
 
 function bindLightbox(root: ParentNode = document): void {
-	for (const img of root.querySelectorAll<HTMLImageElement>('.prose img')) {
+	for (const img of root.querySelectorAll<HTMLImageElement>('.prose img, .moment-images img, .album-photos img')) {
 		if (img.dataset.lightboxBound) continue;
 		if (img.closest('.hero-image, .mermaid-figure, .image-lightbox')) continue;
 		if (img.closest('a[data-no-lightbox]')) continue;

@@ -1,0 +1,78 @@
+---
+import type { ComponentProps } from 'astro/types';
+import Icon from './Icon.astro';
+
+interface Props {
+	title: string;
+	eyebrow?: string;
+	icon?: ComponentProps<typeof Icon>['name'];
+	lede?: string;
+	align?: 'left' | 'center';
+	size?: 'default' | 'large';
+}
+
+const { title, eyebrow, icon, lede, align = 'left', size = 'default' } = Astro.props;
+const hasExtra = Astro.slots.has('default');
+---
+
+<header class:list={['page-header', `align-${align}`, `size-${size}`]}>
+	<slot name="before" />
+	{
+		eyebrow && (
+			<p class="eyebrow">
+				{icon && <Icon name={icon} size={14} />}
+				{eyebrow}
+			</p>
+		)
+	}
+	<h1><slot name="title">{title}</slot></h1>
+	{lede && <p class="lede">{lede}</p>}
+	{
+		hasExtra && (
+			<div class="extra">
+				<slot />
+			</div>
+		)
+	}
+</header>
+
+<style>
+	.page-header {
+		margin-bottom: 1.5rem;
+		animation: rise 0.55s ease both;
+	}
+
+	.align-center {
+		text-align: center;
+	}
+
+	.eyebrow {
+		margin: 0 0 0.45rem;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		font-size: 0.78rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--accent);
+	}
+
+	h1 {
+		margin: 0;
+	}
+
+	.size-large h1 {
+		font-size: clamp(2.2rem, 5vw, 3rem);
+	}
+
+	.lede {
+		margin: 0.55rem 0 0;
+		color: var(--muted);
+		line-height: 1.6;
+	}
+
+	.extra {
+		margin-top: 1rem;
+	}
+</style>

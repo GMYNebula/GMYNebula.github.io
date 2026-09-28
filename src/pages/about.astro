@@ -1,133 +1,115 @@
 ---
 import AvatarPendant from '../components/AvatarPendant.astro';
-import BaseHead from '../components/BaseHead.astro';
 import BrandIcon from '../components/BrandIcon.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
 import Icon from '../components/Icon.astro';
 import { profile } from '../data/profile';
 import { SITE_AUTHOR, SITE_AUTHOR_EN, SITE_TITLE } from '../consts';
+import PageLayout from '../layouts/PageLayout.astro';
 ---
 
-<!doctype html>
-<html lang="zh-CN">
-	<head>
-		<BaseHead title={`关于 · ${SITE_TITLE}`} description={`${SITE_AUTHOR} 是谁呀？`} />
-	</head>
-	<body>
-		<Header />
-		<main class="about-page">
-			<article class="about-card glass">
-				<AvatarPendant alt={`${SITE_AUTHOR} 头像`} size="10rem" width={176} height={176} />
+<PageLayout title={`关于 · ${SITE_TITLE}`} description={`${SITE_AUTHOR} 是谁呀？`} width="narrow">
+	<article class="about-card glass">
+		<AvatarPendant alt={`${SITE_AUTHOR} 头像`} size="10rem" width={176} height={176} />
 
-				<header class="hero">
-					<h1>{SITE_AUTHOR_EN}</h1>
-					<p class="display-name">{SITE_AUTHOR}</p>
-					<a class="email" href={`mailto:${profile.email}`}>{profile.email}</a>
-				</header>
+		<header class="hero">
+			<h1>{SITE_AUTHOR_EN}</h1>
+			<p class="display-name">{SITE_AUTHOR}</p>
+			<a class="email" href={`mailto:${profile.email}`}>{profile.email}</a>
+		</header>
 
-				<nav class="about-icons" aria-label="社交链接">
-					<a
-						class="icon-link"
-						href={profile.github}
-						target="_blank"
-						rel="noopener noreferrer"
-						aria-label="GitHub"
-					>
-						<BrandIcon name="github" size={22} />
-					</a>
-					<a
-						class="icon-link"
-						href={profile.bilibili}
-						target="_blank"
-						rel="noopener noreferrer"
-						aria-label="Bilibili"
-					>
-						<BrandIcon name="bilibili" size={22} />
-					</a>
-					<a
-						class="icon-link"
-						href={profile.csdn}
-						target="_blank"
-						rel="noopener noreferrer"
-						aria-label="CSDN"
-					>
-						<BrandIcon name="csdn" size={22} />
-					</a>
-					<a
-						class="icon-link"
-						href="#"
-						data-qq-add
-						data-qq-uin={profile.qq}
-						data-qq-card={profile.qqCardUrl}
-						aria-label="QQ 加好友"
-					>
-						<BrandIcon name="qq" size={22} />
-					</a>
-				</nav>
-				<p class="qq-hint" data-qq-hint hidden></p>
+		<nav class="about-icons" aria-label="社交链接">
+			<a
+				class="icon-link"
+				href={profile.github}
+				target="_blank"
+				rel="noopener noreferrer"
+				aria-label="GitHub"
+			>
+				<BrandIcon name="github" size={22} />
+			</a>
+			<a
+				class="icon-link"
+				href={profile.bilibili}
+				target="_blank"
+				rel="noopener noreferrer"
+				aria-label="Bilibili"
+			>
+				<BrandIcon name="bilibili" size={22} />
+			</a>
+			<a
+				class="icon-link"
+				href={profile.csdn}
+				target="_blank"
+				rel="noopener noreferrer"
+				aria-label="CSDN"
+			>
+				<BrandIcon name="csdn" size={22} />
+			</a>
+			<a
+				class="icon-link"
+				href="#"
+				data-qq-add
+				data-qq-uin={profile.qq}
+				data-qq-card={profile.qqCardUrl}
+				aria-label="QQ 加好友"
+			>
+				<BrandIcon name="qq" size={22} />
+			</a>
+		</nav>
+		<p class="qq-hint" data-qq-hint hidden></p>
 
-				<div class="intro">
-					<p>
-						你好，我是 <strong>{SITE_AUTHOR}</strong>（{SITE_AUTHOR_EN}）(=^･ω･^=)
-					</p>
-					<p>人设是猫。喜欢猫娘，也喜欢编程。这里是我的小窝——写代码的碎碎念和分享日常收藏都会住在这儿。</p>
-					<p>欢迎坐下来喝杯可可 ✧</p>
-				</div>
+		<div class="intro">
+			<p>
+				你好，我是 <strong>{SITE_AUTHOR}</strong>（{SITE_AUTHOR_EN}）(=^･ω･^=)
+			</p>
+			<p>人设是猫。喜欢猫娘，也喜欢编程。这里是我的小窝——写代码的碎碎念和分享日常收藏都会住在这儿。</p>
+			<p>欢迎坐下来喝杯可可 ✧</p>
+		</div>
 
-				<section class="reward" aria-label="赞赏">
-					<button type="button" class="reward-toggle" id="reward-toggle">
-						<Icon name="heart" size={15} />
-						<span>赞赏作者</span>
-					</button>
-					<div class="reward-panel" id="reward-panel" hidden>
-						<p class="reward-note">请作者喝饮料~</p>
-						<ul class="qr-grid">
-							<li>
-								<a href={profile.qr.wechat} target="_blank" rel="noopener noreferrer">
-									<img src={profile.qr.wechat} alt="微信赞赏码" loading="lazy" />
-								</a>
-								<span><BrandIcon name="wechat" size={14} /> WeChat</span>
-							</li>
-							<li>
-								<a href={profile.qr.qqPay} target="_blank" rel="noopener noreferrer">
-									<img src={profile.qr.qqPay} alt="QQ 赞赏码" loading="lazy" />
-								</a>
-								<span><BrandIcon name="qq" size={14} /> QQ</span>
-							</li>
-						</ul>
-					</div>
-				</section>
-			</article>
-		</main>
-		<Footer />
-		<script>
-			import { bindQQAddButtons } from '../scripts/open-qq.ts';
+		<section class="reward" aria-label="赞赏">
+			<button type="button" class="reward-toggle" id="reward-toggle">
+				<Icon name="heart" size={15} />
+				<span>赞赏作者</span>
+			</button>
+			<div class="reward-panel" id="reward-panel" hidden>
+				<p class="reward-note">请作者喝饮料~</p>
+				<ul class="qr-grid">
+					<li>
+						<a href={profile.qr.wechat} target="_blank" rel="noopener noreferrer">
+							<img src={profile.qr.wechat} alt="微信赞赏码" loading="lazy" />
+						</a>
+						<span><BrandIcon name="wechat" size={14} /> WeChat</span>
+					</li>
+					<li>
+						<a href={profile.qr.qqPay} target="_blank" rel="noopener noreferrer">
+							<img src={profile.qr.qqPay} alt="QQ 赞赏码" loading="lazy" />
+						</a>
+						<span><BrandIcon name="qq" size={14} /> QQ</span>
+					</li>
+				</ul>
+			</div>
+		</section>
+	</article>
+<script>
+	import { bindQQAddButtons } from '../scripts/open-qq.ts';
 
-			const toggle = document.getElementById('reward-toggle');
-			const panel = document.getElementById('reward-panel');
-			toggle?.addEventListener('click', () => {
-				if (!panel) return;
-				const open = panel.hasAttribute('hidden');
-				panel.toggleAttribute('hidden', !open);
-				toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-			});
+	const toggle = document.getElementById('reward-toggle');
+	const panel = document.getElementById('reward-panel');
+	toggle?.addEventListener('click', () => {
+		if (!panel) return;
+		const open = panel.hasAttribute('hidden');
+		panel.toggleAttribute('hidden', !open);
+		toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+	});
 
-			bindQQAddButtons();
-		</script>
-	</body>
-</html>
+	bindQQAddButtons();
+</script>
+</PageLayout>
 
 <style>
-	.about-page {
-		width: min(640px, calc(100% - 2.5rem));
-		margin: 0 auto;
-		padding: 2rem 0 3.5rem;
-		animation: rise 0.65s ease both;
-	}
-
 	.about-card {
 		padding: 2rem 1.65rem 1.85rem;
+		animation: rise 0.65s ease both;
 		text-align: center;
 	}
 
