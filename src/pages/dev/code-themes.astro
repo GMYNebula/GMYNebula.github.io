@@ -3,12 +3,12 @@ import { createHighlighter } from 'shiki';
 import PageLayout from '../../layouts/PageLayout.astro';
 
 const lightCandidates = [
-	{ id: 'ayu-light', note: '当前日间 · Ayu Light' },
+	{ id: 'ayu-light', note: 'Ayu Light' },
 	{ id: 'rose-pine-dawn', note: '奶油暖底' },
 	{ id: 'catppuccin-latte', note: '粉彩柔和' },
 	{ id: 'vitesse-light', note: '暖黄博客风' },
 	{ id: 'snazzy-light', note: '干净 IDE 亮' },
-	{ id: 'github-light-default', note: 'GitHub 标准亮' },
+	{ id: 'github-light-default', note: '当前日间 · GitHub 标准亮' },
 	{ id: 'one-light', note: 'One Light 简洁' },
 	{ id: 'material-theme-lighter', note: 'Material 浅灰' },
 	{ id: 'everforest-light', note: '森林暖绿浅' },
@@ -19,8 +19,8 @@ const lightCandidates = [
 ] as const;
 
 const darkCandidates = [
-	{ id: 'ayu-dark', note: '当前夜间 · Ayu Dark' },
-	{ id: 'github-dark-dimmed', note: 'GitHub 暗' },
+	{ id: 'ayu-dark', note: 'Ayu Dark' },
+	{ id: 'github-dark-dimmed', note: '当前夜间 · GitHub 暗' },
 	{ id: 'rose-pine-moon', note: '与 rose-pine-dawn 成套' },
 	{ id: 'catppuccin-mocha', note: '与 catppuccin-latte 成套' },
 	{ id: 'vitesse-dark', note: '与 vitesse-light 成套' },

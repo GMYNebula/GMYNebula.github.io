@@ -1,8 +1,8 @@
 import { defineEcConfig } from 'astro-expressive-code';
 
 export default defineEcConfig({
-	// 夜间：ayu-dark；日间：ayu-light
-	themes: ['ayu-dark', 'ayu-light'],
+	// 夜间：github-dark-dimmed；日间：github-light-default
+	themes: ['github-dark-dimmed', 'github-light-default'],
 	useDarkModeMediaQuery: false,
 	customizeTheme(theme) {
 		theme.name = theme.type === 'dark' ? 'dark' : 'light';
@@ -17,24 +17,24 @@ export default defineEcConfig({
 	styleOverrides: {
 		borderRadius: '0.65rem',
 		codeFontSize: '0.9rem',
-		borderColor: ['#1b1f29', 'rgba(107, 125, 143, 0.15)'],
-		codeBackground: ['#10141c', '#fcfcfc'],
-		codeForeground: ['#bfbdb6', '#5c6166'],
+		borderColor: ['#444c56', '#d0d7de'],
+		codeBackground: ['#22272e', '#ffffff'],
+		codeForeground: ['#adbac7', '#1f2328'],
 		focusBorder: ['rgba(232, 131, 107, 0.55)', 'rgba(196, 75, 47, 0.45)'],
 		frames: {
 			shadowColor: 'transparent',
 			frameBoxShadowCssValue: 'none',
-			editorActiveTabForeground: ['#bfbdb6', '#5c6166'],
-			editorActiveTabIndicatorTopColor: ['#e6b450', '#f29718'],
-			editorActiveTabBackground: ['#10141c', '#fcfcfc'],
-			editorTabBarBackground: ['#0d1017', '#f8f9fa'],
-			editorTabBarBorderColor: ['#1b1f29', 'rgba(107, 125, 143, 0.12)'],
-			editorTabBarBorderBottomColor: ['#1b1f29', 'rgba(107, 125, 143, 0.12)'],
-			editorBackground: ['#10141c', '#fcfcfc'],
-			terminalTitlebarBackground: ['#0d1017', '#f8f9fa'],
-			terminalTitlebarForeground: ['#5a6378', '#828e9f'],
-			terminalTitlebarBorderBottomColor: ['#1b1f29', 'rgba(107, 125, 143, 0.12)'],
-			terminalBackground: ['#0d1017', '#f8f9fa'],
+			editorActiveTabForeground: ['#adbac7', '#1f2328'],
+			editorActiveTabIndicatorTopColor: ['transparent', 'transparent'],
+			editorActiveTabBackground: ['#22272e', '#ffffff'],
+			editorTabBarBackground: ['#1c2128', '#f6f8fa'],
+			editorTabBarBorderColor: ['#444c56', '#d0d7de'],
+			editorTabBarBorderBottomColor: ['#444c56', '#d0d7de'],
+			editorBackground: ['#22272e', '#ffffff'],
+			terminalTitlebarBackground: ['#1c2128', '#f6f8fa'],
+			terminalTitlebarForeground: ['#768390', '#656d76'],
+			terminalTitlebarBorderBottomColor: ['#444c56', '#d0d7de'],
+			terminalBackground: ['#22272e', '#ffffff'],
 		},
 	},
 });

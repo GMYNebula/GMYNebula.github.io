@@ -813,6 +813,10 @@ code {
 	margin: 1.5em 0;
 }
 
+.prose .expressive-code:has(+ .expressive-code) {
+	margin-bottom: 0.45em;
+}
+
 /* 代码块与行内 code 共用 --font-mono-stack；修正 EC 在 CJK 等宽下 ch 换行撑破宽度 */
 .prose .expressive-code pre > code,
 .prose .expressive-code .ec-line .code {
@@ -831,8 +835,59 @@ html[data-theme='light'] .prose .expressive-code .frame {
 	box-shadow: 0 1px 0 rgba(110, 106, 134, 0.1), 0 4px 16px rgba(87, 82, 121, 0.06);
 }
 
-html[data-theme='light'] .prose .expressive-code .frame pre {
-	border-color: rgba(110, 106, 134, 0.14);
+/* 文件名默认会被渲染成突出的编辑器标签；改成与终端相同的整条标题栏 */
+.prose .expressive-code .frame.has-title:not(.is-terminal) {
+	--button-spacing: calc(1.9rem + var(--ec-brdWd) + 2 * var(--ec-uiPadBlk));
+}
+
+.prose .expressive-code .frame.has-title:not(.is-terminal) .header {
+	align-items: center;
+	justify-content: center;
+	padding-block: var(--ec-uiPadBlk);
+	padding-block-end: calc(var(--ec-uiPadBlk) + var(--ec-brdWd));
+	padding-inline-start: 0;
+	font-weight: 500;
+	letter-spacing: 0.025ch;
+	color: var(--ec-frm-trmTtbFg);
+	background: var(--ec-frm-trmTtbBg);
+	border: var(--ec-brdWd) solid var(--ec-brdCol);
+	border-bottom: none;
+}
+
+.prose .expressive-code .frame.has-title:not(.is-terminal) .header::before {
+	inset: auto;
+	left: var(--ec-uiPadInl);
+	width: 2.1rem;
+	height: 0.56rem;
+	border: none;
+	border-radius: 0;
+	background-color: var(--ec-frm-trmTtbDotsFg);
+	opacity: var(--ec-frm-trmTtbDotsOpa);
+	-webkit-mask-image: var(--ec-frm-trmIcon);
+	mask-image: var(--ec-frm-trmIcon);
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+}
+
+.prose .expressive-code .frame.has-title:not(.is-terminal) .header::after {
+	border: none;
+	border-radius: 0;
+	border-bottom: var(--ec-brdWd) solid var(--ec-frm-trmTtbBrdBtmCol);
+}
+
+.prose .expressive-code .frame.has-title:not(.is-terminal) .title {
+	position: static;
+	margin: 0;
+	padding: 0;
+	overflow: visible;
+	color: inherit;
+	background: transparent;
+	border: none;
+	border-radius: 0;
+}
+
+.prose .expressive-code .frame.has-title:not(.is-terminal) .title::after {
+	content: none;
 }
 
 /* 文章底栏标签：不要被 prose 列表规则挤歪 */
